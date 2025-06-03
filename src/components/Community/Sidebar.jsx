@@ -46,11 +46,13 @@ const MatchingItem = styled(NavLink)`
 const Sidebar = () => {
   return (
     <Aside>
-      <SidebarItem to={"/community"}>전체</SidebarItem>
+      <SidebarItem to={"all"}>전체</SidebarItem>
       <SidebarItem to={"daily"}>일상</SidebarItem>
       <SidebarItem to={"qa"}>Q&A</SidebarItem>
       <SidebarItem to={"feedback"}>피드백</SidebarItem>
-      <SidebarItem to={"matching"}>팀매칭</SidebarItem>
+      <SidebarItem to={"matching"} onClick={(e) => e.preventDefault()}>
+        팀매칭
+      </SidebarItem>
       <MatchingItem to={"matching/study"}>ㄴ스터디</MatchingItem>
       <MatchingItem to={"matching/project"}>ㄴ프로젝트</MatchingItem>
     </Aside>
