@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { NavLink } from "react-router-dom";
 
 const Item = styled.div`
   flex: 1;
@@ -33,7 +34,18 @@ const BoardItem = ({ post }) => {
         </p>
         <p style={{ fontSize: "13px", color: "#666" }}>{post.preview}</p>
       </div>
-      <div style={{ alignSelf: "center", fontWeight: "500" }}>→</div>
+      <NavLink
+        style={{
+          alignSelf: "center",
+          fontWeight: "500",
+          cursor: "pointer",
+          textDecoration: "none",
+          color: "inherit",
+        }}
+        to={`view/${post.id}`}
+      >
+        →
+      </NavLink>
     </Item>
   );
 };

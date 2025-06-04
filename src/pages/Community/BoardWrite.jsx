@@ -21,12 +21,13 @@ const Header = styled.header`
   z-index: 1;
 `;
 
-const NavItem = styled.p`
+const NavItem = styled(NavLink)`
   font-family: Arial, sans-serif;
   font-size: 14px;
   font-weight: bold;
   color: #333;
   cursor: pointer;
+  text-decoration: none;
 `;
 
 const GuideOverlay = styled.div`
@@ -51,7 +52,6 @@ const GuideOverlayHeader = styled.div`
   margin-bottom: 20px;
   background-color: #d2d2d2;
   height: 60px;
-  margin-top: 8px;
   padding-inline: 20px;
 `;
 
@@ -71,7 +71,7 @@ const BoardWrite = () => {
             }}
           />
           <NavItem>탐색</NavItem>
-          <NavItem>커뮤니티</NavItem>
+          <NavItem to={"/community/all"}>커뮤니티</NavItem>
           <NavItem>채용</NavItem>
         </div>
         <NavItem onClick={() => setIsGuideOpen(true)}>작성가이드</NavItem>

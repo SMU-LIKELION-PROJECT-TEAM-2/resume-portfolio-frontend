@@ -21,6 +21,7 @@ import MatchStudy from "../pages/Community/MatchStudy";
 import MatchProject from "../pages/Community/MatchProject";
 import AllBoard from "../pages/Community/AllBoard";
 import BoardWrite from "../pages/Community/BoardWrite";
+import BoardView from "../pages/Community/BoardView";
 
 function Router() {
   return (
@@ -32,13 +33,25 @@ function Router() {
       <Route path="/category/portfolio" element={<PopularPortfolio />} />
       <Route path="/category/team" element={<TeamMatching />} />
       <Route path="/community" element={<Community />}>
-        <Route path="all" element={<AllBoard />} />
-        <Route path="daily" element={<Daily />} />
-        <Route path="qa" element={<Qa />} />
-        <Route path="feedback" element={<Feedback />} />
+        <Route path="all" element={<AllBoard />}>
+          <Route path="view/:id" element={<BoardView />} />
+        </Route>
+        <Route path="daily" element={<Daily />}>
+          <Route path="view/:id" element={<BoardView />} />
+        </Route>
+        <Route path="qa" element={<Qa />}>
+          <Route path="view/:id" element={<BoardView />} />
+        </Route>
+        <Route path="feedback" element={<Feedback />}>
+          <Route path="view/:id" element={<BoardView />} />
+        </Route>
         <Route path="matching">
-          <Route path="study" element={<MatchStudy />} />
-          <Route path="project" element={<MatchProject />} />
+          <Route path="study" element={<MatchStudy />}>
+            <Route path="view/:id" element={<BoardView />} />
+          </Route>
+          <Route path="project" element={<MatchProject />}>
+            <Route path="view/:id" element={<BoardView />} />
+          </Route>
         </Route>
       </Route>
       <Route path="/community/write" element={<BoardWrite />} />
