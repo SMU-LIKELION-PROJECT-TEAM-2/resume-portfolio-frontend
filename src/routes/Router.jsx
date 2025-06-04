@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import Home from '../pages/Home';
+import MainPage from '../pages/MainPage/MainPage';
 import About from '../pages/About';
 import GuidePage from '../pages/GuidePage';
 import TemplateList from '../pages/TemplateList';
@@ -18,7 +18,7 @@ import MyPage from '../pages/MyPage';
 function Router() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<MainPage />} />
       <Route path="/about" element={<About />} />
       <Route path="/category/guide" element={<GuidePage />} />
       <Route path="/category/templates" element={<TemplateList />} />
