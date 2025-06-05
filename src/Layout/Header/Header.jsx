@@ -13,7 +13,7 @@ const Header = () => {
         <nav className="navigation">
           <Link to="/" className="nav-link">탐색</Link>
           <a href="#community" className="nav-link">커뮤니티</a>
-          <a href="#jobs" className="nav-link">채용</a>
+          <Link to="/jobs" className="nav-link">채용</Link>
           <Link to="/editor" className="nav-link">포트폴리오 작성</Link>
         </nav>
       </div>
