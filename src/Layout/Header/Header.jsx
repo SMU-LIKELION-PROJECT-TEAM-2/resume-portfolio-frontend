@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; 
 import './HeaderStyles.css';
 import { FaSearch } from 'react-icons/fa';
 
@@ -10,9 +11,10 @@ const Header = () => {
           <p>로고</p>
         </div>
         <nav className="navigation">
-          <a href="#exploration" className="nav-link">탐색</a>
+          <Link to="/" className="nav-link">탐색</Link>
           <a href="#community" className="nav-link">커뮤니티</a>
           <a href="#jobs" className="nav-link">채용</a>
+          <Link to="/editor" className="nav-link">포트폴리오 작성</Link>
         </nav>
       </div>
       <div className="header-center">

@@ -6,7 +6,7 @@ import TemplateList from '../pages/TemplateList';
 import PopularPortfolio from '../pages/PopularPortfolio';
 import TeamMatching from '../pages/TeamMatching';
 import Community from '../pages/Community';
-import WritePage from '../pages/WritePage';
+import PortfolioEditorPage from '../pages/PortfolioEditorPage/PortfolioEditorPage';
 import SkillProject from '../pages/SkillProject';
 import StudyRecommend from '../pages/StudyRecommend';
 import TeamFind from '../pages/TeamFind';
@@ -25,7 +25,7 @@ function Router() {
       <Route path="/category/portfolio" element={<PopularPortfolio />} />
       <Route path="/category/team" element={<TeamMatching />} />
       <Route path="/community" element={<Community />} />
-      <Route path="/category/write" element={<WritePage />} />
+      <Route path="/editor" element={<PortfolioEditorPage />} />
       <Route path="/project/recommend" element={<SkillProject />} />
       <Route path="/project/study" element={<StudyRecommend />} />
       <Route path="/project/find" element={<TeamFind />} />
