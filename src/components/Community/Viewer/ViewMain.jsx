@@ -7,6 +7,11 @@ const Main = styled.main`
   border-radius: 8px;
 `;
 
+const PostTitle = styled.div``;
+
+const PostBody = styled.div``;
+
+const PostComment = styled.div``;
 const ViewMain = () => {
   return <Main></Main>;
 };
