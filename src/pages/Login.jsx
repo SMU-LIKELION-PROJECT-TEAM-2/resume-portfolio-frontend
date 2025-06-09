@@ -3,12 +3,15 @@ import React, { useState } from 'react';
 import styled from "@emotion/styled";
 import Header from "../Layout/Header/Header";
 import { validateLogin, loginApi, saveToken } from '../api/auth';
+import useAuthStore from '../stores/useAuthStore';
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 80vh;
+  background: #fafafa;
 `;
 
 const LoginBox = styled.div`
@@ -238,6 +241,8 @@ function Login() {
   const [errors, setErrors] = useState({});
   const [loginError, setLoginError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login } = useAuthStore();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -255,9 +260,12 @@ function Login() {
     setLoading(true);
     try {
       const data = await loginApi(form);
-      if (data.token) saveToken(data.token);
-      // 로그인 성공 후 이동
-      // window.location.href = '/dashboard';
+      if (data.token) {
+        saveToken(data.token);
+        login(data.token); // Zustand로 인증 상태 갱신
+        // 로그인 성공 후 이동
+        // navigate('/dashboard');
+      }
     } catch (err) {
       setLoginError(err.message);
     }

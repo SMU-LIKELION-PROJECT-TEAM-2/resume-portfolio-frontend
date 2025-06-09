@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import styled from "@emotion/styled";
 import Header from "../Layout/Header/Header";
 import { checkUsername, signup, validateSignUp } from '../api/user';
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   display: flex;
@@ -162,8 +163,6 @@ const ErrorMsg = styled.div`
   margin-top: 8px;
 `;
 
-
-
 const ValidMsg = styled.div`
   height: 21px;
   font-family: 'Pretendard Variable', sans-serif;
@@ -174,8 +173,6 @@ const ValidMsg = styled.div`
   color: #007AFF;
   margin-top: 8px;
 `;
-
-
 
 const SubmitButton = styled.button`
   width: 100%;
@@ -196,6 +193,7 @@ const SubmitButton = styled.button`
 `;
 
 function SignUp() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     nickname: '',
     loginId: '',
@@ -208,7 +206,6 @@ function SignUp() {
   const [idChecked, setIdChecked] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // 입력값 변경
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -217,7 +214,6 @@ function SignUp() {
     if (name === 'loginId') setIdChecked(false);
   };
 
-  // 클리어 버튼
   const handleClear = (field) => {
     setForm((prev) => ({ ...prev, [field]: '' }));
     setErrors((prev) => ({ ...prev, [field]: '' }));
@@ -225,7 +221,6 @@ function SignUp() {
     if (field === 'loginId') setIdChecked(false);
   };
 
-  // 아이디 중복확인
   const handleIdCheck = async () => {
     if (!form.loginId.trim()) {
       setErrors((prev) => ({ ...prev, loginId: '아이디를 입력하세요.' }));
@@ -268,15 +263,15 @@ function SignUp() {
         password: form.password,
         email: form.email,
       });
-      alert('회원가입 완료!');
-      // window.location.href = '/login';
+      // 회원가입 성공 플래그 남기고 이동
+      sessionStorage.setItem("signupSuccess", "true");
+      navigate("/signup/success");
     } catch (err) {
       alert(err.message);
     }
     setLoading(false);
   };
 
-  // "사용가능" 메시지와 보더 파랑 상태
   const isValid = (name) => {
     if (name === 'loginId') {
       return !errors.loginId && !!form.loginId && touched.loginId && idChecked;
@@ -285,180 +280,179 @@ function SignUp() {
     return !errors[name] && !!form[name] && touched[name];
   };
 
-  // 에러 상태
   const isError = (name) => !!errors[name] && touched[name];
 
   return (
     <>
-    <Header />
-    <Wrapper>
-      <SignUpBox>
-        <TitleContainer>
-          <Title>회원가입</Title>
-        </TitleContainer>
-        <InputsWrapper as="form" onSubmit={handleSubmit} autoComplete="off">
-          {/* 닉네임 */}
-          <InputContainer>
-            <Label htmlFor="nickname">닉네임</Label>
-            <InputRow>
-              <InputWrapper>
-                <Input
-                  id="nickname"
-                  name="nickname"
-                  type="text"
-                  placeholder="닉네임"
-                  value={form.nickname}
-                  onChange={handleChange}
-                  error={isError('nickname')}
-                  valid={isValid('nickname')}
-                  autoComplete="off"
-                  disabled={loading}
-                />
-                <ClearButton
-                  type="button"
-                  show={!!form.nickname}
-                  onClick={() => handleClear('nickname')}
-                  aria-label="닉네임 지우기"
-                  disabled={loading}
-                >×</ClearButton>
-              </InputWrapper>
-            </InputRow>
-            {isError('nickname') && <ErrorMsg>{errors.nickname}</ErrorMsg>}
-          </InputContainer>
-          <Spacer />
+      <Header />
+      <Wrapper>
+        <SignUpBox>
+          <TitleContainer>
+            <Title>회원가입</Title>
+          </TitleContainer>
+          <InputsWrapper as="form" onSubmit={handleSubmit} autoComplete="off">
+            {/* 닉네임 */}
+            <InputContainer>
+              <Label htmlFor="nickname">닉네임</Label>
+              <InputRow>
+                <InputWrapper>
+                  <Input
+                    id="nickname"
+                    name="nickname"
+                    type="text"
+                    placeholder="닉네임"
+                    value={form.nickname}
+                    onChange={handleChange}
+                    error={isError('nickname')}
+                    valid={isValid('nickname')}
+                    autoComplete="off"
+                    disabled={loading}
+                  />
+                  <ClearButton
+                    type="button"
+                    show={!!form.nickname}
+                    onClick={() => handleClear('nickname')}
+                    aria-label="닉네임 지우기"
+                    disabled={loading}
+                  >×</ClearButton>
+                </InputWrapper>
+              </InputRow>
+              {isError('nickname') && <ErrorMsg>{errors.nickname}</ErrorMsg>}
+            </InputContainer>
+            <Spacer />
 
-          {/* 아이디 */}
-          <InputContainer>
-            <Label htmlFor="loginId">아이디</Label>
-            <InputRow>
-              <InputWrapper>
-                <Input
-                  id="loginId"
-                  name="loginId"
-                  type="text"
-                  placeholder="아이디"
-                  value={form.loginId}
-                  onChange={handleChange}
-                  error={isError('loginId')}
-                  valid={isValid('loginId')}
-                  autoComplete="off"
-                  disabled={loading}
-                />
-                <ClearButton
+            {/* 아이디 */}
+            <InputContainer>
+              <Label htmlFor="loginId">아이디</Label>
+              <InputRow>
+                <InputWrapper>
+                  <Input
+                    id="loginId"
+                    name="loginId"
+                    type="text"
+                    placeholder="아이디"
+                    value={form.loginId}
+                    onChange={handleChange}
+                    error={isError('loginId')}
+                    valid={isValid('loginId')}
+                    autoComplete="off"
+                    disabled={loading}
+                  />
+                  <ClearButton
+                    type="button"
+                    show={!!form.loginId}
+                    onClick={() => handleClear('loginId')}
+                    aria-label="아이디 지우기"
+                    disabled={loading}
+                  >×</ClearButton>
+                </InputWrapper>
+                <CheckButton
                   type="button"
-                  show={!!form.loginId}
-                  onClick={() => handleClear('loginId')}
-                  aria-label="아이디 지우기"
-                  disabled={loading}
-                >×</ClearButton>
-              </InputWrapper>
-              <CheckButton
-                type="button"
-                onClick={handleIdCheck}
-                disabled={isValid('loginId') || loading}
-              >
-                중복 확인
-              </CheckButton>
-            </InputRow>
-            {isError('loginId') && <ErrorMsg>{errors.loginId}</ErrorMsg>}
-            {isValid('loginId') && <ValidMsg>사용가능</ValidMsg>}
-          </InputContainer>
-          <Spacer />
+                  onClick={handleIdCheck}
+                  disabled={isValid('loginId') || loading}
+                >
+                  중복 확인
+                </CheckButton>
+              </InputRow>
+              {isError('loginId') && <ErrorMsg>{errors.loginId}</ErrorMsg>}
+              {isValid('loginId') && <ValidMsg>사용가능</ValidMsg>}
+            </InputContainer>
+            <Spacer />
 
-          {/* 비밀번호 */}
-          <InputContainer>
-            <Label htmlFor="password">비밀번호</Label>
-            <InputRow>
-              <InputWrapper>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="비밀번호"
-                  value={form.password}
-                  onChange={handleChange}
-                  error={isError('password')}
-                  valid={isValid('password')}
-                  autoComplete="new-password"
-                  disabled={loading}
-                />
-                <ClearButton
-                  type="button"
-                  show={!!form.password}
-                  onClick={() => handleClear('password')}
-                  aria-label="비밀번호 지우기"
-                  disabled={loading}
-                >×</ClearButton>
-              </InputWrapper>
-            </InputRow>
-            {isError('password') && <ErrorMsg>{errors.password}</ErrorMsg>}
-            {isValid('password') && <ValidMsg>사용가능</ValidMsg>}
-          </InputContainer>
-          <Spacer />
+            {/* 비밀번호 */}
+            <InputContainer>
+              <Label htmlFor="password">비밀번호</Label>
+              <InputRow>
+                <InputWrapper>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="비밀번호"
+                    value={form.password}
+                    onChange={handleChange}
+                    error={isError('password')}
+                    valid={isValid('password')}
+                    autoComplete="new-password"
+                    disabled={loading}
+                  />
+                  <ClearButton
+                    type="button"
+                    show={!!form.password}
+                    onClick={() => handleClear('password')}
+                    aria-label="비밀번호 지우기"
+                    disabled={loading}
+                  >×</ClearButton>
+                </InputWrapper>
+              </InputRow>
+              {isError('password') && <ErrorMsg>{errors.password}</ErrorMsg>}
+              {isValid('password') && <ValidMsg>사용가능</ValidMsg>}
+            </InputContainer>
+            <Spacer />
 
-          {/* 비밀번호 확인 */}
-          <InputContainer>
-            <Label htmlFor="password2">비밀번호 확인</Label>
-            <InputRow>
-              <InputWrapper>
-                <Input
-                  id="password2"
-                  name="password2"
-                  type="password"
-                  placeholder="비밀번호 확인"
-                  value={form.password2}
-                  onChange={handleChange}
-                  error={isError('password2')}
-                  valid={isValid('password2')}
-                  autoComplete="new-password"
-                  disabled={loading}
-                />
-                <ClearButton
-                  type="button"
-                  show={!!form.password2}
-                  onClick={() => handleClear('password2')}
-                  aria-label="비밀번호확인 지우기"
-                  disabled={loading}
-                >×</ClearButton>
-              </InputWrapper>
-            </InputRow>
-            {isError('password2') && <ErrorMsg>{errors.password2}</ErrorMsg>}
-            {isValid('password2') && <ValidMsg>사용가능</ValidMsg>}
-          </InputContainer>
-          <Spacer />
+            {/* 비밀번호 확인 */}
+            <InputContainer>
+              <Label htmlFor="password2">비밀번호 확인</Label>
+              <InputRow>
+                <InputWrapper>
+                  <Input
+                    id="password2"
+                    name="password2"
+                    type="password"
+                    placeholder="비밀번호 확인"
+                    value={form.password2}
+                    onChange={handleChange}
+                    error={isError('password2')}
+                    valid={isValid('password2')}
+                    autoComplete="new-password"
+                    disabled={loading}
+                  />
+                  <ClearButton
+                    type="button"
+                    show={!!form.password2}
+                    onClick={() => handleClear('password2')}
+                    aria-label="비밀번호확인 지우기"
+                    disabled={loading}
+                  >×</ClearButton>
+                </InputWrapper>
+              </InputRow>
+              {isError('password2') && <ErrorMsg>{errors.password2}</ErrorMsg>}
+              {isValid('password2') && <ValidMsg>사용가능</ValidMsg>}
+            </InputContainer>
+            <Spacer />
 
-          {/* 이메일 */}
-          <InputContainer>
-            <Label htmlFor="email">이메일</Label>
-            <InputRow>
-              <InputWrapper>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="이메일"
-                  value={form.email}
-                  onChange={handleChange}
-                  error={isError('email')}
-                  valid={isValid('email')}
-                  autoComplete="off"
-                  disabled={loading}
-                />
-                <ClearButton
-                  type="button"
-                  show={!!form.email}
-                  onClick={() => handleClear('email')}
-                  aria-label="이메일 지우기"
-                  disabled={loading}
-                >×</ClearButton>
-              </InputWrapper>
-            </InputRow>
-            {isError('email') && <ErrorMsg>{errors.email}</ErrorMsg>}
-          </InputContainer>
-          <SubmitButton type="submit" disabled={loading}>완료</SubmitButton>
-        </InputsWrapper>
-      </SignUpBox>
-    </Wrapper>
+            {/* 이메일 */}
+            <InputContainer>
+              <Label htmlFor="email">이메일</Label>
+              <InputRow>
+                <InputWrapper>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="이메일"
+                    value={form.email}
+                    onChange={handleChange}
+                    error={isError('email')}
+                    valid={isValid('email')}
+                    autoComplete="off"
+                    disabled={loading}
+                  />
+                  <ClearButton
+                    type="button"
+                    show={!!form.email}
+                    onClick={() => handleClear('email')}
+                    aria-label="이메일 지우기"
+                    disabled={loading}
+                  >×</ClearButton>
+                </InputWrapper>
+              </InputRow>
+              {isError('email') && <ErrorMsg>{errors.email}</ErrorMsg>}
+            </InputContainer>
+            <SubmitButton type="submit" disabled={loading}>완료</SubmitButton>
+          </InputsWrapper>
+        </SignUpBox>
+      </Wrapper>
     </>
   );
 }
