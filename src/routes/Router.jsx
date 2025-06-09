@@ -14,12 +14,16 @@ import ProjectRegister from '../pages/ProjectRegister';
 import Login from '../pages/Login';
 import Signup from '../pages/Signup';
 import MyPage from '../pages/MyPage';
-
+import OAuthCallbackKakao from '../pages/OAuthCallbackKakao';
+import OAuthCallbackGoogle from '../pages/OAuthCallbackGoogle';
+import Onboarding from '../pages/Onboarding';
+import SignUpSuccess from '../pages/SignUpSuccess';
 function Router() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
+      <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/category/guide" element={<GuidePage />} />
       <Route path="/category/templates" element={<TemplateList />} />
       <Route path="/category/portfolio" element={<PopularPortfolio />} />
@@ -32,7 +36,11 @@ function Router() {
       <Route path="/project/register" element={<ProjectRegister />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/signup/success" element={<SignUpSuccess />} />
       <Route path="/mypage" element={<MyPage />} />
+      {/* 소셜 로그인 콜백 경로 추가 */}
+      <Route path="/oauth/callback/kakao" element={<OAuthCallbackKakao />} />
+      <Route path="/oauth/callback/google" element={<OAuthCallbackGoogle />} />
     </Routes>
   );
 }
