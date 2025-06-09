@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
-import { NavLink, useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import ViewMain from "../../components/Community/Viewer/ViewMain";
+import { dummyPosts } from "./Community";
 
 const Header = styled.header`
   height: 80px;
@@ -14,9 +15,17 @@ const Header = styled.header`
   font-size: 18px;
   font-weight: 600;
 `;
-const BoardView = ({ post }) => {
+
+const BoardView = () => {
+  const { id } = useParams();
   const { title } = useOutletContext();
   const nav = useNavigate();
+
+  const post = dummyPosts.find((p) => p.id === Number(id));
+
+  if (!post)
+    return <p style={{ padding: "40px" }}>존재하지 않는 게시글입니다.</p>;
+
   return (
     <>
       <Header>
@@ -32,7 +41,7 @@ const BoardView = ({ post }) => {
         </p>
         {title}
       </Header>
-      <ViewMain />
+      <ViewMain post={post} />
     </>
   );
 };

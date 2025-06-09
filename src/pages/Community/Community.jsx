@@ -11,6 +11,25 @@ export const dummyPosts = Array.from({ length: 20 }, (_, i) => ({
   title: `이곳은 제목이 들어갈 자리입니다.`,
   tags: ["게시판 태그", "분야 태그"],
   preview: `이 게시글 본문에 작성된 첫 번째 문단을 노출합니다. 최대 길이는 1 line으로 0000px입니다.`,
+  comments: [
+    {
+      id: 1,
+      author: "사용자이름",
+      content: "이곳은 댓글의 본문이 들어가는 자리입니다.",
+      createdAt: "19시간 전",
+      parentId: null,
+      replies: [
+        {
+          id: 2,
+          author: "사용자이름",
+          content: "이곳은 대댓글 본문입니다.",
+          createdAt: "19시간 전",
+          parentId: 1,
+          replies: [],
+        },
+      ],
+    },
+  ],
 }));
 
 const Layout = styled.div`
