@@ -14,7 +14,7 @@ const Feedback = () => {
           <BoardTable />
         </>
       )}
-      <Outlet />
+      <Outlet context={{ title: "피드백" }} />
     </>
   );
 };

@@ -15,7 +15,7 @@ const Daily = () => {
           <BoardTable />
         </>
       )}
-      <Outlet />
+      <Outlet context={{ title: "일상" }} />
     </>
   );
 };

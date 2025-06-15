@@ -1,4 +1,13 @@
+import Header from "../../Layout/Header/Header";
+import Footer from "../../Layout/Footer/Footer";
+import MyPageMain from "../../components/MyPage/MyPageMain";
 function MyPage() {
-  return <h1>마이페이지 (내 문서/경력 관리)</h1>;
+  return (
+    <>
+      <Header />
+      <MyPageMain />
+      <Footer />
+    </>
+  );
 }
 export default MyPage;

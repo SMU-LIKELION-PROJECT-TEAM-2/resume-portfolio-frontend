@@ -15,7 +15,7 @@ const Qa = () => {
         </>
       )}
 
-      <Outlet />
+      <Outlet context={{ title: "Q&A" }} />
     </>
   );
 };

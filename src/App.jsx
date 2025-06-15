@@ -3,7 +3,9 @@ import Router from "./routes/Router";
 import { Global, css } from "@emotion/react";
 
 const GlobalStyle = css`
-  body {
+  html,
+  body,
+  #root {
     margin: 0;
     padding: 0;
     font-family: sans-serif;

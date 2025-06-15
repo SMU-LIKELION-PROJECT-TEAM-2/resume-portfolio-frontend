@@ -16,7 +16,7 @@ const MatchProject = () => {
           <BoardTable />
         </>
       )}
-      <Outlet />
+      <Outlet context={{ title: "팀매칭_프로젝트" }} />
     </>
   );
 };
