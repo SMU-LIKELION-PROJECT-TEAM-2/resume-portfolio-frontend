@@ -22,6 +22,7 @@ import MatchProject from "../pages/Community/MatchProject";
 import AllBoard from "../pages/Community/AllBoard";
 import BoardWrite from "../pages/Community/BoardWrite";
 import BoardView from "../pages/Community/BoardView";
+import ProfileEdit from "../pages/MyPage/ProfileEdit";
 
 function Router() {
   return (
@@ -63,6 +64,7 @@ function Router() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/mypage" element={<MyPage />} />
+      <Route path="/mypage/edit" element={<ProfileEdit />} />
     </Routes>
   );
 }
