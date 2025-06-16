@@ -1,7 +1,7 @@
 import { Outlet, useParams } from "react-router-dom";
-import BoardHeader from "../../components/Community/BoardHeader";
-import BoardTable from "../../components/Community/BoardTable";
-import BoardTabs from "../../components/Community/BoardTabs";
+import BoardHeader from "../../components/Community/Index/BoardHeader";
+import BoardTable from "../../components/Community/Index/BoardTable";
+import BoardTabs from "../../components/Community/Index/BoardTabs";
 
 const Feedback = () => {
   const { id } = useParams();

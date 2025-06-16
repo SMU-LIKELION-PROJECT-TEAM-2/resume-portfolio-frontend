@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { CirclePlus } from "lucide-react";
 const BannerImg = styled.img`
   position: absolute;
 `;
@@ -25,20 +26,7 @@ const MyPageBanner = () => {
           alignItems: "center",
         }}
       >
-        <p
-          style={{
-            borderRadius: "22px",
-            margin: "0px",
-            border: "1px solid",
-            width: "22px",
-            height: "22px",
-            textAlign: "center",
-            cursor: "pointer",
-            color: "#777777",
-          }}
-        >
-          +
-        </p>
+        <CirclePlus color="#777777" style={{ cursor: "pointer" }} />
         <p style={{ margin: "0px", color: "#777777" }}>배너 이미지 업로드</p>
       </div>
     </BannerInit>

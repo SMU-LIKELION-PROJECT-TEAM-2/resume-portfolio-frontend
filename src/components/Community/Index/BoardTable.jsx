@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { dummyPosts } from "../../pages/Community/Community";
+import { dummyPosts } from "../../../pages/Community/Community";
 import BoardItem from "./BoardItem";
 
 const BoardTable = () => {

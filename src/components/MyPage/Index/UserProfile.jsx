@@ -1,5 +1,6 @@
 import { flush } from "@emotion/css";
 import styled from "@emotion/styled";
+import { NavLink } from "react-router-dom";
 
 const ProfileLayout = styled.div`
   background-color: #eeeeee;
@@ -67,7 +68,7 @@ const UserProfile = () => {
           gap: "10px",
         }}
       >
-        <p
+        <NavLink
           style={{
             width: "100%",
             textAlign: "center",
@@ -75,10 +76,14 @@ const UserProfile = () => {
             borderRadius: "34px",
             margin: "0",
             backgroundColor: "#D9D9D9",
+            cursor: "pointer",
+            textDecoration: "none",
+            color: "inherit",
           }}
+          to={`/mypage/edit`}
         >
           프로필 편집
-        </p>
+        </NavLink>
         <p
           style={{
             width: "100%",
