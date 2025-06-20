@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styled from '@emotion/styled';
 
 const PageWrapper = styled.div`
@@ -30,7 +30,7 @@ const SidebarArea = styled.aside`
   top: 40px;
 `;
 
-const PortfolioEditorPageLayout = ({ actionBar, headerContent, resumeSections, guide }) => {
+const PortfolioEditorPageLayout = forwardRef(({ actionBar, headerContent, resumeSections, guide }, ref) => {
   return (
     <PageWrapper>
       <PageHeader>
@@ -38,7 +38,7 @@ const PortfolioEditorPageLayout = ({ actionBar, headerContent, resumeSections, g
         {actionBar}
       </PageHeader>
       <EditorContainer>
-        <ContentArea>
+        <ContentArea ref={ref}>
           {resumeSections}
         </ContentArea>
         <SidebarArea>
@@ -47,6 +47,6 @@ const PortfolioEditorPageLayout = ({ actionBar, headerContent, resumeSections, g
       </EditorContainer>
     </PageWrapper>
   );
-};
+});
 
 export default PortfolioEditorPageLayout;

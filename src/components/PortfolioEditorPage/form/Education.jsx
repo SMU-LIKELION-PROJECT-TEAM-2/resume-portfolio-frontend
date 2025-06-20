@@ -165,7 +165,6 @@ const CalendarIcon = () => (
 );
 
 const Education = forwardRef((props, ref) => {
-    // --- 교육 섹션 상태 및 핸들러 ---
     const [educations, setEducations] = useState([
         {
             id: 1, type: '', institution: '', major: '', 
@@ -185,7 +184,6 @@ const Education = forwardRef((props, ref) => {
     };
 
     const deleteEducation = (id) => {
-        // 마지막 항목도 삭제 가능하도록 수정
         setEducations(educations.filter(edu => edu.id !== id));
     };
 
@@ -197,9 +195,7 @@ const Education = forwardRef((props, ref) => {
     };
 
     useImperativeHandle(ref, () => ({
-        // 'getComponentData' 라는 이름으로 함수를 노출시킴
         getComponentData: () => {
-        // 컴포넌트의 현재 상태(데이터)를 반환
         return educations;
         }
     }));

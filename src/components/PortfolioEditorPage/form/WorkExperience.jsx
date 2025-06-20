@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
 
@@ -198,7 +198,7 @@ const createNewExperience = () => ({
   duties: '',
 });
 
-const WorkExperience = () => {
+const WorkExperience = forwardRef((props, ref) => {
   const [experiences, setExperiences] = useState([createNewExperience()]);
 
   const addExperience = () => {
@@ -225,6 +225,12 @@ const WorkExperience = () => {
       exp.id === id ? { ...exp, [name]: val } : exp
     ));
   };
+
+  useImperativeHandle(ref, () => ({
+    getComponentData: () => {
+        return experiences;
+    }
+  }));
 
   return (
     <SectionContainer>
@@ -304,6 +310,6 @@ const WorkExperience = () => {
       ))}
     </SectionContainer>
   );
-};
+});
 
 export default WorkExperience;
