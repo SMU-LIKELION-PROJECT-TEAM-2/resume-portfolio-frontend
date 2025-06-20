@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
 
@@ -147,8 +147,7 @@ const CalendarIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 12H12V17H17V12ZM16 1V3H8V1H6V3H5C3.89 3 3 3.89 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.89 20.1 3 19 3H18V1H16ZM19 19H5V8H19V19Z" fill="#868e96"/></svg>
 );
 
-const Certification = () => {
-    // --- 자격증 섹션 상태 및 핸들러 ---
+const Certification = forwardRef((props, ref) => {
     const [certifications, setCertifications] = useState([
         { id: 1, name: '', score: '', issuingOrg: '', acquisitionDate: '' }
     ]);
@@ -174,6 +173,12 @@ const Certification = () => {
             cert.id === id ? { ...cert, [name]: value } : cert
         ));
     };
+
+    useImperativeHandle(ref, () => ({
+        getComponentData: () => {
+            return certifications;
+        }
+    }));
 
     return (
         <SectionContainer>
@@ -246,6 +251,6 @@ const Certification = () => {
             </SectionWrapper>
         </SectionContainer>
     );
-};
+});
 
 export default Certification;

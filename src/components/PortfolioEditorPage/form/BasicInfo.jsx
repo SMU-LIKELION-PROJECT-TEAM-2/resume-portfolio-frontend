@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
 
@@ -158,7 +158,27 @@ const SearchIcon = () => (
   </svg>
 );
 
-const BasicInfo = () => {
+const BasicInfo = forwardRef((props, ref) => {
+  const [basicInfo, setBasicInfo] = useState({
+    email: '',
+    phone: '',
+    address: '',
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setBasicInfo(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  useImperativeHandle(ref, () => ({
+    getComponentData: () => {
+      return basicInfo;
+    }
+  }));
+
   return (
     <SectionContainer>
       <Header>
@@ -196,7 +216,13 @@ const BasicInfo = () => {
           <FormLabel>이메일</FormLabel>
           <RequiredBadge>필수</RequiredBadge>
         </LabelWrapper>
-        <Input type="email" placeholder="이메일을 입력해주세요" />
+        <Input
+          type="email"
+          name="email"
+          placeholder="이메일을 입력해주세요"
+          value={basicInfo.email}
+          onChange={handleChange}
+        />
       </FormSection>
 
       <FormSection>
@@ -204,13 +230,24 @@ const BasicInfo = () => {
           <FormLabel>전화번호</FormLabel>
           <RequiredBadge>필수</RequiredBadge>
         </LabelWrapper>
-        <Input type="tel" placeholder="-없이 입력해주세요" />
+        <Input
+          type="tel"
+          name="phone"
+          placeholder="-없이 입력해주세요"
+          value={basicInfo.phone}
+          onChange={handleChange}
+        />
       </FormSection>
 
       <FormSection>
         <FormLabel>주소</FormLabel>
         <AddressInputWrapper>
-          <Input placeholder="주소 검색" />
+          <Input
+            name="address"
+            placeholder="주소 검색"
+            value={basicInfo.address}
+            onChange={handleChange}
+          />
           <IconWrapper>
             <SearchIcon />
           </IconWrapper>
@@ -218,6 +255,6 @@ const BasicInfo = () => {
       </FormSection>
     </SectionContainer>
   );
-};
+});
 
 export default BasicInfo;

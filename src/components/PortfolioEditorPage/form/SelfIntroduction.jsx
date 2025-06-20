@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
 
@@ -55,12 +55,18 @@ const FieldLabel = styled.label`
     color: #343a40;
 `;
 
-const SelfIntroduction = () => {
+const SelfIntroduction = forwardRef((props, ref) => {
     const [content, setContent] = useState('');
 
     const handleContentChange = (e) => {
         setContent(e.target.value);
     };
+
+    useImperativeHandle(ref, () => ({
+        getComponentData: () => {
+            return content;
+        }
+    }));
 
     return (
         <SectionContainer>
@@ -82,6 +88,6 @@ const SelfIntroduction = () => {
             </SectionWrapper>
         </SectionContainer>
     );
-};
+});
 
 export default SelfIntroduction;

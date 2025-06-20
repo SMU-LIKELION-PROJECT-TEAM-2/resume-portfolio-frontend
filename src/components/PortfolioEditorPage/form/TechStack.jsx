@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
 
@@ -118,7 +118,7 @@ const CloseIcon = () => (
   </svg>
 );
 
-const TechStack = () => {
+const TechStack = forwardRef((props, ref) => {
   const initialSkills = [
     'Adobe Photoshop',
     'Adobe Premiere Pro',
@@ -146,6 +146,12 @@ const TechStack = () => {
       setInputValue('');
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    getComponentData: () => {
+      return skills;
+    }
+  }));
 
   return (
     <SectionContainer>
@@ -185,6 +191,6 @@ const TechStack = () => {
       </SkillsSection>
     </SectionContainer>
   );
-};
+});
 
 export default TechStack;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
 
@@ -161,7 +161,7 @@ const createNewProject = () => ({
   description: '',
 });
 
-const ProjectExperience = () => {
+const ProjectExperience = forwardRef((props, ref) => {
   const [projects, setProjects] = useState([createNewProject()]);
 
   const addProject = () => {
@@ -188,6 +188,12 @@ const ProjectExperience = () => {
       p.id === id ? { ...p, [name]: val } : p
     ));
   };
+
+  useImperativeHandle(ref, () => ({
+    getComponentData: () => {
+        return projects;
+    }
+  }));
 
   return (
     <SectionContainer>
@@ -248,6 +254,6 @@ const ProjectExperience = () => {
       ))}
     </SectionContainer>
   );
-};
+});
 
 export default ProjectExperience;

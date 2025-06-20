@@ -72,26 +72,49 @@ const PortfolioEditorPage = () => {
   };
 
   const handlePdfDownload = async () => {
-    const content = resumeContentRef.current;
-    if (!content) return;
+    const contentToCapture = resumeContentRef.current;
+    if (!contentToCapture) {
+      console.error("PDF 생성 오류: 캡처할 DOM 요소를 찾을 수 없습니다.");
+      return;
+    }
 
     try {
-        const canvas = await html2canvas(content, { scale: 2 });
-        const imageData = canvas.toDataURL('image/png');
-        
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
-        const ratio = canvasWidth / pageWidth;
-        const calculatedHeight = canvasHeight / ratio;
+      const canvas = await html2canvas(contentToCapture, { scale: 2 });
+      const imageData = canvas.toDataURL('image/png');
 
-        pdf.addImage(imageData, 'PNG', 0, 0, pageWidth, calculatedHeight);
-        pdf.save(`${resumeTitle || '새로운 이력서'}.pdf`);
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+
+      const ratio = canvasWidth / pageWidth;
+      const totalImageHeight = canvasHeight / ratio;
+
+      let position = 0;
+      let heightLeft = totalImageHeight;
+
+      pdf.addImage(imageData, 'PNG', 0, position, pageWidth, totalImageHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position -= pageHeight;
+        pdf.addPage();
+        pdf.addImage(imageData, 'PNG', 0, position, pageWidth, totalImageHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`${resumeTitle || '새로운 이력서'}.pdf`);
+
     } catch (error) {
-        console.error("PDF 생성 중 오류 발생:", error);
-        alert("PDF 생성에 실패했습니다.");
+      console.error("PDF 생성 중 오류 발생:", error);
+      alert("PDF 생성에 실패했습니다.");
     }
   };
 
@@ -107,10 +130,14 @@ const PortfolioEditorPage = () => {
 
   const sectionsToRender = RESUME_SECTIONS_CONFIG
     .filter(section => section.isRequired || visibleSections[section.id])
-    .map(section => React.cloneElement(section.component, { key: section.id }));
+    .map(section => React.cloneElement(section.component, { 
+      key: section.id,
+      ref: (el) => (sectionRefs.current[section.id] = el)
+    }));
     
   return (
     <PortfolioEditorPageLayout
+      ref={resumeContentRef}
       actionBar={
         <ActionBar 
           onTempSave={handleTempSave}
@@ -124,6 +151,7 @@ const PortfolioEditorPage = () => {
           onChange={(e) => setResumeTitle(e.target.value)} 
         />
       }
+      resumeContentRef={resumeContentRef}
       resumeSections={sectionsToRender}
       guide={
         <Guide
