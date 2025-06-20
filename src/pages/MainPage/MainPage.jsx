@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo} from 'react';
 import styled from '@emotion/styled';
 import PortfolioSectionHeader from '../../components/MainPage/PortfolioSectionHeader';
 import FeaturedPortfolios from '../../components/MainPage/FeaturedPortfolios';
@@ -12,7 +12,7 @@ const PageContainer = styled.div`
   padding: 0 20px;
 `;
 
-const projectItemsData = Array.from({ length: 16 }, (_, i) => ({
+const projectItemsData = Array.from({ length: 26 }, (_, i) => ({
   id: `project-${i + 1}`,
   type: 'project',
   categories: [`분야${i % 3 + 1}`, `분야${(i + 1) % 3 + 1}`],
@@ -46,36 +46,44 @@ const MainPage = () => {
     activePersonActivityCategory: '전체',
   });
 
-  const [currentItems, setCurrentItems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = activeMainTab === '프로젝트' ? 16 : 8;
 
+  const filteredItems = useMemo(() => {
+    let itemsToDisplay = [];
+    if (activeMainTab === '프로젝트') {
+      itemsToDisplay = projectItemsData;
+      // TODO: projectFilterStates를 사용하여 실제 필터링 로직 구현
+      // 예: return projectItemsData.filter(item => item.category === projectFilterStates.activeProjectSubTab);
+    } else if (activeMainTab === '인물') {
+      itemsToDisplay = personItemsData;
+      // TODO: personFilterStates를 사용하여 실제 필터링 로직 구현
+    }
+    return itemsToDisplay;
+  }, [activeMainTab, projectFilterStates, personFilterStates]); // 탭이나 필터가 변경될 때만 재계산
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeMainTab, projectFilterStates, personFilterStates]);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+
   const handleMainTabChange = (tabName) => {
     setActiveMainTab(tabName);
-    setCurrentPage(1);
+    // 페이지 리셋은 useEffect가 담당하므로 여기서 호출할 필요 없음
     if (tabName === '프로젝트') {
       setProjectFilterStates({ activeProjectSubTab: '개발', activeProjectDetailTag: null });
     } else if (tabName === '인물') {
       setPersonFilterStates({ activePersonJobCategory: '전체', activePersonActivityCategory: '전체' });
     }
   };
-  
-  useEffect(() => {
-    let itemsToDisplay = [];
-    if (activeMainTab === '프로젝트') {
-      itemsToDisplay = projectItemsData;
-    } else if (activeMainTab === '인물') {
-      itemsToDisplay = personItemsData;
-    }
-    
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    setCurrentItems(itemsToDisplay.slice(indexOfFirstItem, indexOfLastItem));
 
-  }, [activeMainTab, projectFilterStates, personFilterStates, currentPage, itemsPerPage]);
-  
-  const totalPages = Math.ceil((activeMainTab === '프로젝트' ? projectItemsData.length : personItemsData.length) / itemsPerPage);
-
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+  };
 
   return (
     <PageContainer>
@@ -93,11 +101,12 @@ const MainPage = () => {
         items={currentItems}
         type={activeMainTab === '프로젝트' ? 'project' : 'person'}
       />
-      {currentItems.length > 0 && (
+      {filteredItems.length > 0 && (
           <Pagination
+            totalItems={filteredItems.length}
+            itemsPerPage={itemsPerPage}
             currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPageChange={handlePageChange}
           />
       )}
     </PageContainer>
