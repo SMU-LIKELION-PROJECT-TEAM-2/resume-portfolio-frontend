@@ -173,6 +173,23 @@ const BasicInfo = forwardRef((props, ref) => {
     }));
   };
 
+  const handleAddressSearch = () => {
+    new window.daum.Postcode({
+      // 2. 사용자가 주소를 선택했을 때 실행될 콜백 함수
+      oncomplete: function(data) {
+        // 도로명 주소, 지번 주소 등 다양한 주소 정보를 data 객체로 받아옵니다.
+        // 여기서는 도로명 주소를 사용합니다.
+        const roadAddr = data.roadAddress; 
+
+        // 3. state를 선택된 주소로 업데이트합니다.
+        setBasicInfo(prev => ({
+          ...prev,
+          address: roadAddr,
+        }));
+      }
+    }).open();
+  };
+
   useImperativeHandle(ref, () => ({
     getComponentData: () => {
       return basicInfo;
@@ -247,6 +264,8 @@ const BasicInfo = forwardRef((props, ref) => {
             placeholder="주소 검색"
             value={basicInfo.address}
             onChange={handleChange}
+            onClick={handleAddressSearch}
+            readOnly
           />
           <IconWrapper>
             <SearchIcon />
