@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
 
@@ -36,12 +36,76 @@ const ProfileSection = styled.section`
   padding-bottom: 40px;
 `;
 
-const ProfileImagePlaceholder = styled.div`
+const ProfileImageContainer = styled.div`
+  position: relative;
   width: 160px;
   height: 160px;
   background-color: #f1f3f5;
+  border: 1px dashed #ced4da;
   border-radius: 8px;
   flex-shrink: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #845ef7;
+    background-color: #f8f9fa;
+  }
+`;
+
+const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const ImageOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  ${ProfileImageContainer}:hover & {
+    opacity: 1;
+  }
+`;
+
+const ImageActionButton = styled.button`
+  background: none;
+  border: none;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const PlaceholderIcon = styled.div`
+    color: #adb5bd;
+    margin-bottom: 8px;
+`;
+
+const PlaceholderText = styled.p`
+    font-size: 14px;
+    color: #868e96;
+    margin: 0;
 `;
 
 const ProfileDetails = styled.div`
@@ -60,7 +124,7 @@ const InfoRow = styled.div`
 const InfoLabel = styled.span`
   font-size: 14px;
   color: #868e96;
-  width: 70px; // 레이블 너비 고정으로 정렬 맞춤
+  width: 70px;
 `;
 
 const InfoValue = styled.span`
@@ -130,7 +194,7 @@ const IconWrapper = styled.div`
   right: 16px;
   top: 50%;
   transform: translateY(-50%);
-  pointer-events: none; // 아이콘이 클릭되지 않도록 설정
+  pointer-events: none;
 `;
 
 const SearchIcon = () => (
@@ -163,7 +227,11 @@ const BasicInfo = forwardRef((props, ref) => {
     email: '',
     phone: '',
     address: '',
+    profileImage: null,
   });
+
+  const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -175,13 +243,9 @@ const BasicInfo = forwardRef((props, ref) => {
 
   const handleAddressSearch = () => {
     new window.daum.Postcode({
-      // 2. 사용자가 주소를 선택했을 때 실행될 콜백 함수
       oncomplete: function(data) {
-        // 도로명 주소, 지번 주소 등 다양한 주소 정보를 data 객체로 받아옵니다.
-        // 여기서는 도로명 주소를 사용합니다.
         const roadAddr = data.roadAddress; 
 
-        // 3. state를 선택된 주소로 업데이트합니다.
         setBasicInfo(prev => ({
           ...prev,
           address: roadAddr,
@@ -189,6 +253,34 @@ const BasicInfo = forwardRef((props, ref) => {
       }
     }).open();
   };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setBasicInfo(prev => ({ ...prev, profileImage: file }));
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveImage = (e) => {
+    e.stopPropagation();
+    setBasicInfo(prev => ({ ...prev, profileImage: null }));
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setImagePreview(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   useImperativeHandle(ref, () => ({
     getComponentData: () => {
@@ -207,7 +299,31 @@ const BasicInfo = forwardRef((props, ref) => {
       </Description>
 
       <ProfileSection>
-        <ProfileImagePlaceholder />
+        <ProfileImageContainer onClick={() => fileInputRef.current.click()}>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleImageChange}
+            accept="image/jpg, image/jpeg, image/png"
+            style={{ display: 'none' }}
+          />
+
+          {imagePreview ? (
+            <>
+              <ProfileImage src={imagePreview} alt="프로필 미리보기" />
+              <ImageOverlay>
+                <ImageActionButton>변경</ImageActionButton>
+                <ImageActionButton onClick={handleRemoveImage}>삭제</ImageActionButton>
+              </ImageOverlay>
+            </>
+          ) : (
+            <>
+              <PlaceholderIcon><CameraIcon/></PlaceholderIcon>
+              <PlaceholderText>사진 추가</PlaceholderText>
+            </>
+          )}
+
+        </ProfileImageContainer>
         <ProfileDetails>
           <InfoRow>
             <InfoLabel>이름</InfoLabel>
@@ -275,5 +391,12 @@ const BasicInfo = forwardRef((props, ref) => {
     </SectionContainer>
   );
 });
+
+const CameraIcon = () => (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 21H4C3.44772 21 3 20.5523 3 20V8C3 7.44772 3.44772 7 4 7H7.15792C7.5955 7 8.01353 6.78644 8.28688 6.42502L9.71312 4.57498C9.98647 4.21356 10.4045 4 10.8421 4H13.1579C13.5955 4 14.0135 4.21356 14.2869 4.57498L15.7131 6.42502C15.9865 6.78644 16.4045 7 16.8421 7H20C20.5523 7 21 7.44772 21 8V20C21 20.5523 20.5523 21 20 21Z" stroke="#adb5bd" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M12 17C14.2091 17 16 15.2091 16 13C16 10.7909 14.2091 9 12 9C9.79086 9 8 10.7909 8 13C8 15.2091 9.79086 17 12 17Z" stroke="#adb5bd" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
 
 export default BasicInfo;
