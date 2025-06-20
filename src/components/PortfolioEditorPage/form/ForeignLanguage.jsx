@@ -215,7 +215,6 @@ const ForeignLanguage = forwardRef((props, ref) => {
                                     <option value="Beginner">기초</option>
                                     <option value="Conversational">회화 가능</option>
                                     <option value="Business">비즈니스</option>
-                                    <option value="Fluent">유창함</option>
                                     <option value="Native">원어민 수준</option>
                                 </StyledSelect>
                             </FieldWrapper>

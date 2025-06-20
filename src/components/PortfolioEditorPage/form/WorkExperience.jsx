@@ -1,4 +1,6 @@
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
 
@@ -107,6 +109,15 @@ const baseInputStyles = `
 const StyledInput = styled.input`${baseInputStyles}`;
 const StyledTextarea = styled.textarea`${baseInputStyles}`;
 
+const DatePickerInput = styled(StyledInput)`
+  cursor: pointer;
+  
+  &:disabled {
+    background-color: #f1f3f5;
+    cursor: not-allowed;
+  }
+`;
+
 const DateRow = styled.div`
   display: flex;
   align-items: center;
@@ -117,7 +128,6 @@ const CheckboxWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-left: auto; /* 오른쪽 끝으로 밀어내기 */
   
   label {
     font-size: 14px;
@@ -145,7 +155,7 @@ const SelectWrapper = styled.div`
 
 const StyledSelect = styled.select`
   ${baseInputStyles}
-  appearance: none; // 기본 화살표 제거
+  appearance: none;
   padding-right: 40px;
 `;
 
@@ -186,11 +196,25 @@ const ChevronDownIcon = () => (
     </svg>
 );
 
+const CustomDateInput = forwardRef(({ value, onClick, placeholder, disabled }, ref) => (
+  <InputWithIconWrapper ref={ref} onClick={!disabled ? onClick : undefined}>
+    <DatePickerInput 
+      value={value} 
+      placeholder={placeholder}
+      disabled={disabled}
+      readOnly
+    />
+    <InputIcon>
+      <CalendarIcon />
+    </InputIcon>
+  </InputWithIconWrapper>
+));
+
 const createNewExperience = () => ({
   id: Date.now(),
   company: '',
-  startDate: '',
-  endDate: '',
+  startDate: null,
+  endDate: null,
   isCurrent: false,
   position: '',
   department: '',
@@ -221,8 +245,20 @@ const WorkExperience = forwardRef((props, ref) => {
     const { name, value, type, checked } = e.target;
     const val = type === 'checkbox' ? checked : value;
 
-    setExperiences(experiences.map(exp => 
-      exp.id === id ? { ...exp, [name]: val } : exp
+    setExperiences(experiences.map(exp => {
+      if (exp.id === id) {
+        if (name === 'isCurrent' && checked) {
+          return { ...exp, isCurrent: true, endDate: null };
+        }
+        return { ...exp, [name]: val };
+      }
+      return exp;
+    }));
+  };
+
+  const handleDateChange = (id, fieldName, date) => {
+    setExperiences(experiences.map(exp =>
+      exp.id === id ? { ...exp, [fieldName]: date } : exp
     ));
   };
 
@@ -261,15 +297,31 @@ const WorkExperience = forwardRef((props, ref) => {
           <FormRow>
              <FormLabel>재직 기간</FormLabel>
              <DateRow>
-                <InputWithIconWrapper>
-                    <StyledInput name="startDate" value={exp.startDate} onChange={(e) => handleInputChange(exp.id, e)} placeholder="입사연월" />
-                    <InputIcon><CalendarIcon /></InputIcon>
-                </InputWithIconWrapper>
+                <DatePicker
+                  selected={exp.startDate}
+                  onChange={(date) => handleDateChange(exp.id, 'startDate', date)}
+                  selectsStart
+                  startDate={exp.startDate}
+                  endDate={exp.endDate}
+                  dateFormat="yyyy.MM"
+                  showMonthYearPicker
+                  placeholderText="입사연월"
+                  customInput={<CustomDateInput />}
+                />
                 <span>~</span>
-                <InputWithIconWrapper>
-                    <StyledInput name="endDate" value={exp.endDate} onChange={(e) => handleInputChange(exp.id, e)} placeholder="퇴사연월" disabled={exp.isCurrent}/>
-                    <InputIcon><CalendarIcon /></InputIcon>
-                </InputWithIconWrapper>
+                <DatePicker
+                  selected={exp.endDate}
+                  onChange={(date) => handleDateChange(exp.id, 'endDate', date)}
+                  selectsEnd
+                  startDate={exp.startDate}
+                  endDate={exp.endDate}
+                  minDate={exp.startDate}
+                  dateFormat="yyyy.MM"
+                  showMonthYearPicker
+                  placeholderText="퇴사연월"
+                  disabled={exp.isCurrent}
+                  customInput={<CustomDateInput />}
+                />
                 <CheckboxWrapper>
                     <input type="checkbox" id={`isCurrent-${exp.id}`} name="isCurrent" checked={exp.isCurrent} onChange={(e) => handleInputChange(exp.id, e)} />
                     <label htmlFor={`isCurrent-${exp.id}`}>재직중</label>

@@ -1,4 +1,6 @@
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
 
@@ -102,6 +104,10 @@ const StyledTextarea = styled.textarea`
     font-family: inherit;
 `;
 
+const DatePickerInput = styled(StyledInput)`
+  cursor: pointer;
+`;
+
 const FieldsGrid = styled.div`
     display: grid;
     grid-template-columns: 1fr; // 대외활동은 필드가 적어 1단으로 변경
@@ -160,9 +166,22 @@ const CalendarIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 12H12V17H17V12ZM16 1V3H8V1H6V3H5C3.89 3 3 3.89 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.89 20.1 3 19 3H18V1H16ZM19 19H5V8H19V19Z" fill="#868e96"/></svg>
 );
 
+const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
+  <DateInputWrapper ref={ref} onClick={onClick}>
+    <DatePickerInput 
+      value={value} 
+      placeholder={placeholder} 
+      readOnly
+    />
+    <IconWrapper>
+      <CalendarIcon />
+    </IconWrapper>
+  </DateInputWrapper>
+));
+
 const Extracurricular = forwardRef((props, ref) => {
     const [activities, setActivities] = useState([
-        { id: 1, name: '', organization: '', startDate: '', endDate: '', description: '' }
+        { id: 1, name: '', organization: '', startDate: null, endDate: null, description: '' }
     ]);
 
     const addActivity = () => {
@@ -172,7 +191,7 @@ const Extracurricular = forwardRef((props, ref) => {
         }
         setActivities([
             ...activities,
-            { id: Date.now(), name: '', organization: '', startDate: '', endDate: '', description: '' }
+            { id: Date.now(), name: '', organization: '', startDate: null, endDate: null, description: '' }
         ]);
     };
 
@@ -184,6 +203,12 @@ const Extracurricular = forwardRef((props, ref) => {
         const { name, value } = e.target;
         setActivities(activities.map(act => 
             act.id === id ? { ...act, [name]: value } : act
+        ));
+    };
+
+    const handleDateChange = (id, fieldName, date) => {
+        setActivities(activities.map(act =>
+            act.id === id ? { ...act, [fieldName]: date } : act
         ));
     };
 
@@ -239,15 +264,30 @@ const Extracurricular = forwardRef((props, ref) => {
                             <FieldWrapper className="full-width">
                                 <FieldLabel>활동 기간</FieldLabel>
                                 <DateInputContainer>
-                                    <DateInputWrapper>
-                                        <StyledInput type="text" name="startDate" value={activity.startDate} onChange={e => handleActivityChange(activity.id, e)} placeholder="시작년월 (YYYY.MM)"/>
-                                        <IconWrapper><CalendarIcon /></IconWrapper>
-                                    </DateInputWrapper>
+                                    <DatePicker
+                                        selected={activity.startDate}
+                                        onChange={(date) => handleDateChange(activity.id, 'startDate', date)}
+                                        selectsStart
+                                        startDate={activity.startDate}
+                                        endDate={activity.endDate}
+                                        dateFormat="yyyy.MM"
+                                        showMonthYearPicker
+                                        placeholderText="시작년월 (YYYY.MM)"
+                                        customInput={<CustomDateInput />}
+                                    />
                                     <span>~</span>
-                                    <DateInputWrapper>
-                                        <StyledInput type="text" name="endDate" value={activity.endDate} onChange={e => handleActivityChange(activity.id, e)} placeholder="종료년월 (YYYY.MM)"/>
-                                        <IconWrapper><CalendarIcon /></IconWrapper>
-                                    </DateInputWrapper>
+                                    <DatePicker
+                                        selected={activity.endDate}
+                                        onChange={(date) => handleDateChange(activity.id, 'endDate', date)}
+                                        selectsEnd
+                                        startDate={activity.startDate}
+                                        endDate={activity.endDate}
+                                        minDate={activity.startDate}
+                                        dateFormat="yyyy.MM"
+                                        showMonthYearPicker
+                                        placeholderText="종료년월 (YYYY.MM)"
+                                        customInput={<CustomDateInput />}
+                                    />
                                 </DateInputContainer>
                             </FieldWrapper>
 
