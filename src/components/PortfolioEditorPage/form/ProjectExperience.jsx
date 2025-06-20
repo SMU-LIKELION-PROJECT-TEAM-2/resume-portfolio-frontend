@@ -1,4 +1,6 @@
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
 
@@ -107,6 +109,15 @@ const baseInputStyles = `
 const StyledInput = styled.input`${baseInputStyles}`;
 const StyledTextarea = styled.textarea`${baseInputStyles}`;
 
+const DatePickerInput = styled(StyledInput)`
+  cursor: pointer;
+  
+  &:disabled {
+    background-color: #f1f3f5;
+    cursor: not-allowed;
+  }
+`;
+
 const DateRow = styled.div`
   display: flex;
   align-items: center;
@@ -127,8 +138,11 @@ const CheckboxWrapper = styled.div`
 `;
 
 const InputWithIconWrapper = styled.div`
-  position: relative;
-  flex: 1;
+    position: relative;
+    flex: 1;
+    input:disabled + & {
+        opacity: 0.6;
+    }
 `;
 
 const InputIcon = styled.div`
@@ -151,12 +165,26 @@ const CalendarIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="#495057" strokeWidth="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="#495057" strokeWidth="2" strokeLinecap="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="#495057" strokeWidth="2" strokeLinecap="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="#495057" strokeWidth="2"/></svg>
 );
 
+const CustomDateInput = forwardRef(({ value, onClick, placeholder, disabled }, ref) => (
+  <InputWithIconWrapper ref={ref} onClick={!disabled ? onClick : undefined}>
+    <DatePickerInput 
+      value={value} 
+      placeholder={placeholder}
+      disabled={disabled}
+      readOnly
+    />
+    <InputIcon>
+      <CalendarIcon />
+    </InputIcon>
+  </InputWithIconWrapper>
+));
+
 const createNewProject = () => ({
   id: Date.now(),
   projectName: '',
   organization: '',
-  startDate: '',
-  endDate: '',
+  startDate: null,
+  endDate: null,
   inProgress: false,
   description: '',
 });
@@ -182,10 +210,22 @@ const ProjectExperience = forwardRef((props, ref) => {
 
   const handleInputChange = (id, e) => {
     const { name, value, type, checked } = e.target;
-    const val = type === 'checkbox' ? checked : value;
+    let val = type === 'checkbox' ? checked : value;
 
+    setProjects(projects.map(p => {
+        if (p.id === id) {
+            if (name === 'inProgress' && checked) {
+                return { ...p, inProgress: true, endDate: null };
+            }
+            return { ...p, [name]: val };
+        }
+        return p;
+    }));
+  };
+
+  const handleDateChange = (id, fieldName, date) => {
     setProjects(projects.map(p =>
-      p.id === id ? { ...p, [name]: val } : p
+      p.id === id ? { ...p, [fieldName]: date } : p
     ));
   };
 
@@ -229,15 +269,31 @@ const ProjectExperience = forwardRef((props, ref) => {
           <FormRow>
             <FormLabel>프로젝트 기간</FormLabel>
             <DateRow>
-              <InputWithIconWrapper>
-                <StyledInput name="startDate" value={project.startDate} onChange={(e) => handleInputChange(project.id, e)} placeholder="시작연월" />
-                <InputIcon><CalendarIcon /></InputIcon>
-              </InputWithIconWrapper>
+              <DatePicker
+                selected={project.startDate}
+                onChange={(date) => handleDateChange(project.id, 'startDate', date)}
+                selectsStart
+                startDate={project.startDate}
+                endDate={project.endDate}
+                dateFormat="yyyy.MM"
+                showMonthYearPicker
+                placeholderText="시작연월"
+                customInput={<CustomDateInput />}
+              />
               <span>~</span>
-              <InputWithIconWrapper>
-                <StyledInput name="endDate" value={project.endDate} onChange={(e) => handleInputChange(project.id, e)} placeholder="종료연월" disabled={project.inProgress} />
-                <InputIcon><CalendarIcon /></InputIcon>
-              </InputWithIconWrapper>
+              <DatePicker
+                selected={project.endDate}
+                onChange={(date) => handleDateChange(project.id, 'endDate', date)}
+                selectsEnd
+                startDate={project.startDate}
+                endDate={project.endDate}
+                minDate={project.startDate}
+                dateFormat="yyyy.MM"
+                showMonthYearPicker
+                placeholderText="종료연월"
+                disabled={project.inProgress}
+                customInput={<CustomDateInput />}
+              />
               <CheckboxWrapper>
                 <input type="checkbox" id={`inProgress-${project.id}`} name="inProgress" checked={project.inProgress} onChange={(e) => handleInputChange(project.id, e)} />
                 <label htmlFor={`inProgress-${project.id}`}>진행중</label>

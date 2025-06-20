@@ -69,6 +69,7 @@ const IconWrapper = styled.div`
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
+  cursor: pointer;
 `;
 
 const TagContainer = styled.div`
@@ -122,9 +123,6 @@ const TechStack = forwardRef((props, ref) => {
   const initialSkills = [
     'Adobe Photoshop',
     'Adobe Premiere Pro',
-    'Adobe Illustrator',
-    'Adobe Illustrator',
-    'Adobe Illustrator',
     'Adobe Illustrator',
   ];
 

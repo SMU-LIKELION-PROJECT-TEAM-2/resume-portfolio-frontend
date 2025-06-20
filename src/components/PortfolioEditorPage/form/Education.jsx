@@ -1,4 +1,6 @@
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
 
@@ -96,6 +98,10 @@ const baseInputStyles = `
 
 const StyledInput = styled.input`${baseInputStyles}`;
 
+const DatePickerInput = styled(StyledInput)`
+  cursor: pointer;
+`;
+
 const StyledSelect = styled.select`
   ${baseInputStyles}
   appearance: none;
@@ -164,11 +170,25 @@ const CalendarIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 12H12V17H17V12ZM16 1V3H8V1H6V3H5C3.89 3 3 3.89 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.89 20.1 3 19 3H18V1H16ZM19 19H5V8H19V19Z" fill="#868e96"/></svg>
 );
 
+const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
+  <DateInputWrapper ref={ref}>
+    <DatePickerInput 
+      value={value} 
+      onClick={onClick} 
+      placeholder={placeholder} 
+      readOnly
+    />
+    <IconWrapper>
+      <CalendarIcon />
+    </IconWrapper>
+  </DateInputWrapper>
+));
+
 const Education = forwardRef((props, ref) => {
     const [educations, setEducations] = useState([
         {
             id: 1, type: '', institution: '', major: '', 
-            status: '', startDate: '', endDate: ''
+            status: '', startDate: null, endDate: null
         }
     ]);
 
@@ -176,7 +196,7 @@ const Education = forwardRef((props, ref) => {
         if (educations.length < 20) {
             setEducations([...educations, { 
                 id: Date.now(), type: '', institution: '', major: '', 
-                status: '', startDate: '', endDate: '' 
+                status: '', startDate: null, endDate: null 
             }]);
         } else {
             alert('최대 20개까지 등록 가능합니다.');
@@ -191,6 +211,12 @@ const Education = forwardRef((props, ref) => {
         const { name, value } = e.target;
         setEducations(educations.map(edu => 
             edu.id === id ? { ...edu, [name]: value } : edu
+        ));
+    };
+
+    const handleDateChange = (id, fieldName, date) => {
+        setEducations(educations.map(edu =>
+            edu.id === id ? { ...edu, [fieldName]: date } : edu
         ));
     };
 
@@ -268,15 +294,30 @@ const Education = forwardRef((props, ref) => {
                             <FieldWrapper className="full-width">
                                 <FieldLabel>재학 기간</FieldLabel>
                                 <DateInputContainer>
-                                    <DateInputWrapper>
-                                        <StyledInput type="text" name="startDate" value={edu.startDate} onChange={e => handleEducationChange(edu.id, e)} placeholder="입학년월 (YYYY.MM)"/>
-                                        <IconWrapper><CalendarIcon /></IconWrapper>
-                                    </DateInputWrapper>
+                                    <DatePicker
+                                        selected={edu.startDate}
+                                        onChange={(date) => handleDateChange(edu.id, 'startDate', date)}
+                                        selectsStart
+                                        startDate={edu.startDate}
+                                        endDate={edu.endDate}
+                                        dateFormat="yyyy.MM"
+                                        showMonthYearPicker
+                                        placeholderText="입학년월 (YYYY.MM)"
+                                        customInput={<CustomDateInput />}
+                                    />
                                     <span>~</span>
-                                    <DateInputWrapper>
-                                        <StyledInput type="text" name="endDate" value={edu.endDate} onChange={e => handleEducationChange(edu.id, e)} placeholder="졸업년월 (YYYY.MM)"/>
-                                        <IconWrapper><CalendarIcon /></IconWrapper>
-                                    </DateInputWrapper>
+                                    <DatePicker
+                                        selected={edu.endDate}
+                                        onChange={(date) => handleDateChange(edu.id, 'endDate', date)}
+                                        selectsEnd
+                                        startDate={edu.startDate}
+                                        endDate={edu.endDate}
+                                        minDate={edu.startDate}
+                                        dateFormat="yyyy.MM"
+                                        showMonthYearPicker
+                                        placeholderText="졸업년월 (YYYY.MM)"
+                                        customInput={<CustomDateInput />}
+                                    />
                                 </DateInputContainer>
                             </FieldWrapper>
                         </FieldsGrid>
