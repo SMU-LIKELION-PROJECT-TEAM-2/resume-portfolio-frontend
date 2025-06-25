@@ -1,6 +1,7 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const MainHeader = styled.div`
     display: flex;
@@ -142,49 +143,43 @@ const DeleteIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H5H21" stroke="#868e96" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="#868e96" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
 );
 
-const Portfolio = forwardRef((props, ref) => {
-    const [urls, setUrls] = useState([
-        { id: 1, name: '', link: '' }
-    ]);
-
+const Portfolio = () => {
+    const portfolioData = useEditorStore((state) => state.portfolio);
+    const setSectionData = useEditorStore((state) => state.setSectionData);
+    
     const addUrl = () => {
-        if (urls.length < 10) {
-            setUrls([...urls, { id: Date.now(), name: '', link: '' }]);
+        if (portfolioData.urls.length < 10) {
+            const newUrls = [...portfolioData.urls, { id: Date.now(), name: '', link: '' }];
+            setSectionData('portfolio', { ...portfolioData, urls: newUrls });
         }
     };
-    const deleteUrl = (id) => setUrls(urls.filter(u => u.id !== id));
+    const deleteUrl = (id) => {
+        const newUrls = portfolioData.urls.filter(u => u.id !== id);
+        setSectionData('portfolio', { ...portfolioData, urls: newUrls });
+    };
     const handleUrlChange = (id, e) => {
         const { name, value } = e.target;
-        setUrls(urls.map(u => u.id === id ? { ...u, [name]: value } : u));
+        const newUrls = portfolioData.urls.map(u => u.id === id ? { ...u, [name]: value } : u);
+        setSectionData('portfolio', { ...portfolioData, urls: newUrls });
     };
 
-    const mockFile1 = { name: "KeepTalkingAndNobodyExplodes-BombDefusalManual-v1-ko.pdf" };
-
-    const [files, setFiles] = useState([
-        { id: 1, fileObject: mockFile1 }
-    ]);
-    
     const addFile = () => {
-        if (files.length < 10) {
-            setFiles([...files, { id: Date.now(), fileObject: null }]);
+        if (portfolioData.files.length < 10) {
+            const newFiles = [...portfolioData.files, { id: Date.now(), fileObject: null }];
+            setSectionData('portfolio', { ...portfolioData, files: newFiles });
         }
     };
-    const deleteFile = (id) => setFiles(files.filter(f => f.id !== id));
+    const deleteFile = (id) => {
+        const newFiles = portfolioData.files.filter(f => f.id !== id);
+        setSectionData('portfolio', { ...portfolioData, files: newFiles });
+    };
     const handleFileChange = (id, e) => {
         const file = e.target.files[0];
         if (file) {
-            setFiles(files.map(f => f.id === id ? { ...f, fileObject: file } : f));
+            const newFiles = portfolioData.files.map(f => f.id === id ? { ...f, fileObject: file } : f);
+            setSectionData('portfolio', { ...portfolioData, files: newFiles });
         }
     };
-
-    useImperativeHandle(ref, () => ({
-        getComponentData: () => {
-            return {
-                urls: urls,
-                files: files,
-            };
-        }
-    }));
 
     return (
         <SectionContainer>
@@ -198,7 +193,8 @@ const Portfolio = forwardRef((props, ref) => {
                     <SectionTitle>URL</SectionTitle>
                     <IconButton onClick={addUrl} aria-label="URL 추가"><AddIcon /></IconButton>
                 </SectionHeader>
-                {urls.map((url, index) => (
+
+                {portfolioData.urls.map((url, index) => (
                     <UrlRow key={url.id}>
                         <RowHeader>
                             <RowLabel>URL {index + 1}</RowLabel>
@@ -219,7 +215,7 @@ const Portfolio = forwardRef((props, ref) => {
                 </SectionHeader>
                 <Description>파일별 최대 10MB까지 업로드 가능 (확장자 : PDF, JPG, PNG)</Description>
                 
-                {files.map((file, index) => (
+                {portfolioData.files.map((file, index) => (
                     <FileRow key={file.id}>
                         <RowLabel>파일 {index + 1}</RowLabel>
                         <FileInputLabel htmlFor={`file-upload-${file.id}`}>
@@ -232,6 +228,6 @@ const Portfolio = forwardRef((props, ref) => {
             </SectionWrapper>
         </SectionContainer>
     );
-});
+};
 
 export default Portfolio;

@@ -35,7 +35,7 @@ const TabButton = styled.button`
   }
 `;
 
-const categories = ['개발', '디자인', '기획', '마케팅', '경영/인사', '영업'];
+const categories = ['전체', '개발', '디자인', '기획', '마케팅', '경영/인사', '영업'];
 
 const JobCategoryTabs = ({ activeCategory, onSelectCategory }) => {
   return (

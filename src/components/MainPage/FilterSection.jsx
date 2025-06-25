@@ -111,6 +111,8 @@ const personActivityCategories = [
   "전체", "리더", "스타트업", "대기업", "프리랜서", "신입", "경력", "파트타임"
 ];
 
+const projectSubCategories = ['전체', ...Object.keys(projectCategoriesData)];
+
 const FilterSection = ({
   activeMainTab,
   onMainTabChange,
@@ -163,7 +165,7 @@ const FilterSection = ({
         <>
           <CategorySection>
             <CategoryButtonsContainer>
-              {Object.keys(projectCategoriesData).map(subCategory => (
+              {projectSubCategories.map(subCategory => (
                 <CategoryButton
                   key={subCategory}
                   isActive={projectFilterStates.activeProjectSubTab === subCategory}
@@ -175,7 +177,7 @@ const FilterSection = ({
             </CategoryButtonsContainer>
           </CategorySection>
 
-          {projectFilterStates.activeProjectSubTab && projectCategoriesData[projectFilterStates.activeProjectSubTab] && (
+          {projectFilterStates.activeProjectSubTab !== '전체' && projectCategoriesData[projectFilterStates.activeProjectSubTab] && (
             <DetailTagsContainer>
               {projectCategoriesData[projectFilterStates.activeProjectSubTab].map(tag => (
                 <DetailTagButton

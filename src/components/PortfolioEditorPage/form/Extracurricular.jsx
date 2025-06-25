@@ -1,8 +1,9 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { forwardRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const MainHeader = styled.div`
     display: flex;
@@ -110,7 +111,7 @@ const DatePickerInput = styled(StyledInput)`
 
 const FieldsGrid = styled.div`
     display: grid;
-    grid-template-columns: 1fr; // 대외활동은 필드가 적어 1단으로 변경
+    grid-template-columns: 1fr;
     gap: 16px;
 
     .full-width {
@@ -179,44 +180,41 @@ const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
   </DateInputWrapper>
 ));
 
-const Extracurricular = forwardRef((props, ref) => {
-    const [activities, setActivities] = useState([
-        { id: 1, name: '', organization: '', startDate: null, endDate: null, description: '' }
-    ]);
+const Extracurricular = () => {
+    const activities = useEditorStore((state) => state.extracurricular);
+    const setSectionData = useEditorStore((state) => state.setSectionData);
 
     const addActivity = () => {
         if (activities.length >= 30) {
             alert('최대 30개까지 등록 가능합니다.');
             return;
         }
-        setActivities([
+        const newActivities = [
             ...activities,
             { id: Date.now(), name: '', organization: '', startDate: null, endDate: null, description: '' }
-        ]);
+        ];
+        setSectionData('extracurricular', newActivities);
     };
 
     const deleteActivity = (id) => {
-        setActivities(activities.filter(act => act.id !== id));
+        const newActivities = activities.filter(act => act.id !== id);
+        setSectionData('extracurricular', newActivities);
     };
 
-    const handleActivityChange = (id, e) => {
+    const handleInputChange = (id, e) => {
         const { name, value } = e.target;
-        setActivities(activities.map(act => 
+        const newActivities = activities.map(act => 
             act.id === id ? { ...act, [name]: value } : act
-        ));
+        );
+        setSectionData('extracurricular', newActivities);
     };
 
     const handleDateChange = (id, fieldName, date) => {
-        setActivities(activities.map(act =>
+        const newActivities = activities.map(act =>
             act.id === id ? { ...act, [fieldName]: date } : act
-        ));
+        );
+        setSectionData('extracurricular', newActivities);
     };
-
-    useImperativeHandle(ref, () => ({
-        getComponentData: () => {
-            return activities;
-        }
-    }));
 
     return (
         <SectionContainer>
@@ -232,7 +230,7 @@ const Extracurricular = forwardRef((props, ref) => {
                         <AddIcon />
                     </IconButton>
                 </SectionHeader>
-
+                
                 {activities.map((activity, index) => (
                     <ActivityRow key={activity.id}>
                         <RowHeader>
@@ -247,7 +245,7 @@ const Extracurricular = forwardRef((props, ref) => {
                                 <FieldLabel>활동명</FieldLabel>
                                 <StyledInput
                                     type="text" name="name" value={activity.name}
-                                    onChange={e => handleActivityChange(activity.id, e)}
+                                    onChange={e => handleInputChange(activity.id, e)}
                                     placeholder="활동명을 입력해주세요"
                                 />
                             </FieldWrapper>
@@ -256,7 +254,7 @@ const Extracurricular = forwardRef((props, ref) => {
                                 <FieldLabel>소속/기관</FieldLabel>
                                 <StyledInput
                                     type="text" name="organization" value={activity.organization}
-                                    onChange={e => handleActivityChange(activity.id, e)}
+                                    onChange={e => handleInputChange(activity.id, e)}
                                     placeholder="소속/기관이 없을 경우 개인 또는 기타로 입력해주세요"
                                 />
                             </FieldWrapper>
@@ -295,7 +293,7 @@ const Extracurricular = forwardRef((props, ref) => {
                                 <FieldLabel>활동 설명</FieldLabel>
                                 <StyledTextarea
                                     name="description" value={activity.description}
-                                    onChange={e => handleActivityChange(activity.id, e)}
+                                    onChange={e => handleInputChange(activity.id, e)}
                                     placeholder="활동 내용과 역할, 상세 기여도를 작성해주세요"
                                     rows="5"
                                 />
@@ -306,6 +304,6 @@ const Extracurricular = forwardRef((props, ref) => {
             </SectionWrapper>
         </SectionContainer>
     );
-});
+};
 
 export default Extracurricular;

@@ -1,6 +1,7 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const MainHeader = styled.div`
     display: flex;
@@ -147,38 +148,34 @@ const CalendarIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 12H12V17H17V12ZM16 1V3H8V1H6V3H5C3.89 3 3 3.89 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.89 20.1 3 19 3H18V1H16ZM19 19H5V8H19V19Z" fill="#868e96"/></svg>
 );
 
-const Certification = forwardRef((props, ref) => {
-    const [certifications, setCertifications] = useState([
-        { id: 1, name: '', score: '', issuingOrg: '', acquisitionDate: '' }
-    ]);
+const Certification = () => {
+    const certifications = useEditorStore((state) => state.certification);
+    const setSectionData = useEditorStore((state) => state.setSectionData);
 
     const addCertification = () => {
         if (certifications.length >= 30) {
             alert('최대 30개까지 등록 가능합니다.');
             return;
         }
-        setCertifications([
+        const newCertifications = [
             ...certifications,
-            { id: Date.now(), name: '', score: '', issuingOrg: '', acquisitionDate: '' }
-        ]);
+            { id: Date.now(), name: '', score: '', issuingOrg: '', acquisitionDate: null }
+        ];
+        setSectionData('certification', newCertifications);
     };
 
     const deleteCertification = (id) => {
-        setCertifications(certifications.filter(cert => cert.id !== id));
+        const newCertifications = certifications.filter(cert => cert.id !== id);
+        setSectionData('certification', newCertifications);
     };
 
     const handleCertificationChange = (id, e) => {
         const { name, value } = e.target;
-        setCertifications(certifications.map(cert => 
+        const newCertifications = certifications.map(cert => 
             cert.id === id ? { ...cert, [name]: value } : cert
-        ));
+        );
+        setSectionData('certification', newCertifications);
     };
-
-    useImperativeHandle(ref, () => ({
-        getComponentData: () => {
-            return certifications;
-        }
-    }));
 
     return (
         <SectionContainer>
@@ -251,6 +248,6 @@ const Certification = forwardRef((props, ref) => {
             </SectionWrapper>
         </SectionContainer>
     );
-});
+};
 
 export default Certification;

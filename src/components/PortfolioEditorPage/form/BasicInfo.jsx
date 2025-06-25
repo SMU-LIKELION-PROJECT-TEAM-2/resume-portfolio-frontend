@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const Header = styled.div`
   display: flex;
@@ -222,34 +223,25 @@ const SearchIcon = () => (
   </svg>
 );
 
-const BasicInfo = forwardRef((props, ref) => {
-  const [basicInfo, setBasicInfo] = useState({
-    email: '',
-    phone: '',
-    address: '',
-    profileImage: null,
-  });
+const BasicInfo = () => {
+  const basicInfo = useEditorStore((state) => state.basicInfo);
+  const setSectionData = useEditorStore((state) => state.setSectionData);
 
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setBasicInfo(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    const newBasicInfo = { ...basicInfo, [name]: value };
+    setSectionData('basicInfo', newBasicInfo);
   };
 
   const handleAddressSearch = () => {
     new window.daum.Postcode({
       oncomplete: function(data) {
         const roadAddr = data.roadAddress; 
-
-        setBasicInfo(prev => ({
-          ...prev,
-          address: roadAddr,
-        }));
+        const newBasicInfo = { ...basicInfo, address: roadAddr };
+        setSectionData('basicInfo', newBasicInfo);
       }
     }).open();
   };
@@ -257,36 +249,30 @@ const BasicInfo = forwardRef((props, ref) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setBasicInfo(prev => ({ ...prev, profileImage: file }));
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
+      const newBasicInfo = { ...basicInfo, profileImage: file };
+      setSectionData('basicInfo', newBasicInfo);
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
       setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const handleRemoveImage = (e) => {
     e.stopPropagation();
-    setBasicInfo(prev => ({ ...prev, profileImage: null }));
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
+    const newBasicInfo = { ...basicInfo, profileImage: null };
+    setSectionData('basicInfo', newBasicInfo);
+    
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
     setImagePreview(null);
   };
-
+  
   useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
+    if (basicInfo.profileImage && typeof basicInfo.profileImage !== 'string') {
+        const newPreview = URL.createObjectURL(basicInfo.profileImage);
+        setImagePreview(newPreview);
 
-  useImperativeHandle(ref, () => ({
-    getComponentData: () => {
-      return basicInfo;
+        return () => URL.revokeObjectURL(newPreview);
     }
-  }));
+  }, [basicInfo.profileImage]);
 
   return (
     <SectionContainer>
@@ -390,7 +376,7 @@ const BasicInfo = forwardRef((props, ref) => {
       </FormSection>
     </SectionContainer>
   );
-});
+};
 
 const CameraIcon = () => (
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

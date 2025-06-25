@@ -1,6 +1,7 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, forwardRef } from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const Header = styled.div`
   display: flex;
@@ -119,18 +120,15 @@ const CloseIcon = () => (
   </svg>
 );
 
-const TechStack = forwardRef((props, ref) => {
-  const initialSkills = [
-    'Adobe Photoshop',
-    'Adobe Premiere Pro',
-    'Adobe Illustrator',
-  ];
-
-  const [skills, setSkills] = useState(initialSkills);
+const TechStack = () => {
+  const skills = useEditorStore((state) => state.techStack);
+  const setSectionData = useEditorStore((state) => state.setSectionData);
+  
   const [inputValue, setInputValue] = useState('');
 
   const handleRemoveSkill = (indexToRemove) => {
-    setSkills(skills.filter((_, index) => index !== indexToRemove));
+    const newSkills = skills.filter((_, index) => index !== indexToRemove);
+    setSectionData('techStack', newSkills);
   };
 
   const handleInputChange = (e) => {
@@ -140,16 +138,11 @@ const TechStack = forwardRef((props, ref) => {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && inputValue.trim() !== '' && skills.length < 20) {
       e.preventDefault();
-      setSkills([...skills, inputValue.trim()]);
+      const newSkills = [...skills, inputValue.trim()];
+      setSectionData('techStack', newSkills);
       setInputValue('');
     }
   };
-
-  useImperativeHandle(ref, () => ({
-    getComponentData: () => {
-      return skills;
-    }
-  }));
 
   return (
     <SectionContainer>
@@ -166,7 +159,7 @@ const TechStack = forwardRef((props, ref) => {
         <InputWrapper>
           <StyledInput
             type="text"
-            placeholder="기술·스킬 검색"
+            placeholder="기술·스킬 검색 후 Enter"
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
@@ -189,6 +182,6 @@ const TechStack = forwardRef((props, ref) => {
       </SkillsSection>
     </SectionContainer>
   );
-});
+};
 
 export default TechStack;

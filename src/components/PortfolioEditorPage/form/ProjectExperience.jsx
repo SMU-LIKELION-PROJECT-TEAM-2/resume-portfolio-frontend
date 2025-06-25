@@ -1,8 +1,9 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { forwardRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const MainHeader = styled.header`
   display: flex;
@@ -189,12 +190,14 @@ const createNewProject = () => ({
   description: '',
 });
 
-const ProjectExperience = forwardRef((props, ref) => {
-  const [projects, setProjects] = useState([createNewProject()]);
+const ProjectExperience = () => {
+  const projects = useEditorStore((state) => state.projectExperience);
+  const setSectionData = useEditorStore((state) => state.setSectionData);
 
   const addProject = () => {
     if (projects.length < 40) {
-      setProjects([...projects, createNewProject()]);
+      const newProjects = [...projects, createNewProject()];
+      setSectionData('projectExperience', newProjects);
     } else {
       alert('프로젝트는 최대 40개까지 등록할 수 있습니다.');
     }
@@ -202,7 +205,8 @@ const ProjectExperience = forwardRef((props, ref) => {
 
   const deleteProject = (id) => {
     if (projects.length > 1) {
-      setProjects(projects.filter(p => p.id !== id));
+      const newProjects = projects.filter(p => p.id !== id);
+      setSectionData('projectExperience', newProjects);
     } else {
       alert('최소 1개의 프로젝트 정보가 필요합니다.');
     }
@@ -212,7 +216,7 @@ const ProjectExperience = forwardRef((props, ref) => {
     const { name, value, type, checked } = e.target;
     let val = type === 'checkbox' ? checked : value;
 
-    setProjects(projects.map(p => {
+    const newProjects = projects.map(p => {
         if (p.id === id) {
             if (name === 'inProgress' && checked) {
                 return { ...p, inProgress: true, endDate: null };
@@ -220,20 +224,16 @@ const ProjectExperience = forwardRef((props, ref) => {
             return { ...p, [name]: val };
         }
         return p;
-    }));
+    });
+    setSectionData('projectExperience', newProjects);
   };
 
   const handleDateChange = (id, fieldName, date) => {
-    setProjects(projects.map(p =>
+    const newProjects = projects.map(p =>
       p.id === id ? { ...p, [fieldName]: date } : p
-    ));
+    );
+    setSectionData('projectExperience', newProjects);
   };
-
-  useImperativeHandle(ref, () => ({
-    getComponentData: () => {
-        return projects;
-    }
-  }));
 
   return (
     <SectionContainer>
@@ -249,67 +249,54 @@ const ProjectExperience = forwardRef((props, ref) => {
 
       {projects.map((project, index) => (
         <ProjectBlock key={project.id}>
-          <BlockHeader>
-            <BlockTitle>프로젝트 {index + 1}</BlockTitle>
-            <IconButton onClick={() => deleteProject(project.id)} aria-label={`프로젝트 ${index + 1} 삭제`}>
-              <DeleteIcon />
-            </IconButton>
-          </BlockHeader>
+          <BlockHeader><BlockTitle>프로젝트 {index + 1}</BlockTitle><IconButton onClick={() => deleteProject(project.id)}><DeleteIcon /></IconButton></BlockHeader>
+            <FormRow><FormLabel>프로젝트명</FormLabel><StyledInput name="projectName" value={project.projectName} onChange={(e) => handleInputChange(project.id, e)} placeholder="프로젝트명을 입력해주세요" /></FormRow>
+            <FormRow><FormLabel>소속/기관</FormLabel><StyledInput name="organization" value={project.organization} onChange={(e) => handleInputChange(project.id, e)} placeholder="소속/기관이 없을 경우 개인 또는 기타로 입력해주세요" /></FormRow>
 
-          <FormRow>
-            <FormLabel>프로젝트명</FormLabel>
-            <StyledInput name="projectName" value={project.projectName} onChange={(e) => handleInputChange(project.id, e)} placeholder="프로젝트명을 입력해주세요" />
-          </FormRow>
-
-          <FormRow>
-            <FormLabel>소속/기관</FormLabel>
-            <StyledInput name="organization" value={project.organization} onChange={(e) => handleInputChange(project.id, e)} placeholder="소속/기관이 없을 경우 개인 또는 기타로 입력해주세요" />
-          </FormRow>
-
-          <FormRow>
-            <FormLabel>프로젝트 기간</FormLabel>
-            <DateRow>
-              <DatePicker
-                selected={project.startDate}
-                onChange={(date) => handleDateChange(project.id, 'startDate', date)}
-                selectsStart
-                startDate={project.startDate}
-                endDate={project.endDate}
-                dateFormat="yyyy.MM"
-                showMonthYearPicker
-                placeholderText="시작연월"
-                customInput={<CustomDateInput />}
-              />
-              <span>~</span>
-              <DatePicker
-                selected={project.endDate}
-                onChange={(date) => handleDateChange(project.id, 'endDate', date)}
-                selectsEnd
-                startDate={project.startDate}
-                endDate={project.endDate}
-                minDate={project.startDate}
-                dateFormat="yyyy.MM"
-                showMonthYearPicker
-                placeholderText="종료연월"
-                disabled={project.inProgress}
-                customInput={<CustomDateInput />}
-              />
-              <CheckboxWrapper>
-                <input type="checkbox" id={`inProgress-${project.id}`} name="inProgress" checked={project.inProgress} onChange={(e) => handleInputChange(project.id, e)} />
-                <label htmlFor={`inProgress-${project.id}`}>진행중</label>
-              </CheckboxWrapper>
-            </DateRow>
-          </FormRow>
-          
-          <FormRow>
-            <FormLabel>프로젝트 설명</FormLabel>
-            <StyledTextarea name="description" value={project.description} onChange={(e) => handleInputChange(project.id, e)} placeholder="프로젝트 내용과 역할, 상세 기여도를 작성해주세요" rows="6" />
-          </FormRow>
+            <FormRow>
+              <FormLabel>프로젝트 기간</FormLabel>
+              <DateRow>
+                <DatePicker
+                  selected={project.startDate}
+                  onChange={(date) => handleDateChange(project.id, 'startDate', date)}
+                  selectsStart
+                  startDate={project.startDate}
+                  endDate={project.endDate}
+                  dateFormat="yyyy.MM"
+                  showMonthYearPicker
+                  placeholderText="시작연월"
+                  customInput={<CustomDateInput />}
+                />
+                <span>~</span>
+                <DatePicker
+                  selected={project.endDate}
+                  onChange={(date) => handleDateChange(project.id, 'endDate', date)}
+                  selectsEnd
+                  startDate={project.startDate}
+                  endDate={project.endDate}
+                  minDate={project.startDate}
+                  dateFormat="yyyy.MM"
+                  showMonthYearPicker
+                  placeholderText="종료연월"
+                  disabled={project.inProgress}
+                  customInput={<CustomDateInput />}
+                />
+                <CheckboxWrapper>
+                  <input type="checkbox" id={`inProgress-${project.id}`} name="inProgress" checked={project.inProgress} onChange={(e) => handleInputChange(project.id, e)} />
+                  <label htmlFor={`inProgress-${project.id}`}>진행중</label>
+                </CheckboxWrapper>
+              </DateRow>
+            </FormRow>
+            
+            <FormRow>
+              <FormLabel>프로젝트 설명</FormLabel>
+              <StyledTextarea name="description" value={project.description} onChange={(e) => handleInputChange(project.id, e)} placeholder="프로젝트 내용과 역할, 상세 기여도를 작성해주세요" rows="6" />
+            </FormRow>
 
         </ProjectBlock>
       ))}
     </SectionContainer>
   );
-});
+};
 
 export default ProjectExperience;
