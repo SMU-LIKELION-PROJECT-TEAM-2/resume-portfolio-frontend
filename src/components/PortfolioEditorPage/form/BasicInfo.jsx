@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const Header = styled.div`
   display: flex;
@@ -222,34 +223,28 @@ const SearchIcon = () => (
   </svg>
 );
 
-const BasicInfo = forwardRef((props, ref) => {
-  const [basicInfo, setBasicInfo] = useState({
-    email: '',
-    phone: '',
-    address: '',
-    profileImage: null,
-  });
+const BasicInfo = () => {
+  // 4. store에서 전역 상태와 액션을 가져옴
+  const basicInfo = useEditorStore((state) => state.basicInfo);
+  const setSectionData = useEditorStore((state) => state.setSectionData);
 
+  // 5. 이미지 미리보기는 이 컴포넌트에서만 사용하므로 지역 state로 유지
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-
+  
+  // 6. 핸들러들이 setBasicInfo 대신 setSectionData를 호출하도록 수정
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setBasicInfo(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    const newBasicInfo = { ...basicInfo, [name]: value };
+    setSectionData('basicInfo', newBasicInfo);
   };
 
   const handleAddressSearch = () => {
     new window.daum.Postcode({
       oncomplete: function(data) {
         const roadAddr = data.roadAddress; 
-
-        setBasicInfo(prev => ({
-          ...prev,
-          address: roadAddr,
-        }));
+        const newBasicInfo = { ...basicInfo, address: roadAddr };
+        setSectionData('basicInfo', newBasicInfo);
       }
     }).open();
   };
@@ -257,36 +252,33 @@ const BasicInfo = forwardRef((props, ref) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setBasicInfo(prev => ({ ...prev, profileImage: file }));
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
+      const newBasicInfo = { ...basicInfo, profileImage: file };
+      setSectionData('basicInfo', newBasicInfo);
+      // 미리보기 URL 생성 로직은 지역 state를 사용하므로 그대로 둡니다.
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
       setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const handleRemoveImage = (e) => {
     e.stopPropagation();
-    setBasicInfo(prev => ({ ...prev, profileImage: null }));
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
+    const newBasicInfo = { ...basicInfo, profileImage: null };
+    setSectionData('basicInfo', newBasicInfo);
+    
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
     setImagePreview(null);
   };
-
+  
+  // 7. 전역 상태와 지역 미리보기 상태를 동기화하는 useEffect 추가
   useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
+    // store의 profileImage가 변경되었을 때(예: 데이터 불러오기), 미리보기도 업데이트
+    if (basicInfo.profileImage && typeof basicInfo.profileImage !== 'string') {
+        const newPreview = URL.createObjectURL(basicInfo.profileImage);
+        setImagePreview(newPreview);
 
-  useImperativeHandle(ref, () => ({
-    getComponentData: () => {
-      return basicInfo;
+        return () => URL.revokeObjectURL(newPreview);
     }
-  }));
+  }, [basicInfo.profileImage]);
 
   return (
     <SectionContainer>
@@ -390,7 +382,7 @@ const BasicInfo = forwardRef((props, ref) => {
       </FormSection>
     </SectionContainer>
   );
-});
+};
 
 const CameraIcon = () => (
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

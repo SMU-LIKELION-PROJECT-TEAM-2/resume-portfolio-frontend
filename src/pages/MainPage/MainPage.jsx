@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useMemo} from 'react';
+import React, { useMemo } from 'react'; // useState, useEffect 제거
 import styled from '@emotion/styled';
+import useMainPageStore from '../../stores/mainPageStore'; // Zustand store 임포트
+
+// 컴포넌트 임포트
 import PortfolioSectionHeader from '../../components/MainPage/PortfolioSectionHeader';
 import FeaturedPortfolios from '../../components/MainPage/FeaturedPortfolios';
 import FilterSection from '../../components/MainPage/FilterSection';
@@ -12,73 +15,66 @@ const PageContainer = styled.div`
   padding: 0 20px;
 `;
 
-const projectItemsData = Array.from({ length: 26 }, (_, i) => ({
-  id: `project-${i + 1}`,
-  type: 'project',
-  categories: [`분야${i % 3 + 1}`, `분야${(i + 1) % 3 + 1}`],
-  title: `포트폴리오 ${i + 1}`,
-  description: '상세설명입니다.',
-  imageUrl: '',
-}));
-
-const personItemsData = Array.from({ length: 8 }, (_, i) => ({
-  id: `person-${i + 1}`,
-  type: 'person',
-  jobs: [`직무${i % 2 + 1}`, `직무${(i + 1) % 2 + 2}`],
-  nickname: `전문가 ${String.fromCharCode(65 + i)}`,
-  profileIntro: '작성자가 입력한 소개',
-  following: Math.floor(Math.random() * 150) + 10,
-  followers: Math.floor(Math.random() * 500) + 50,
-  likes: Math.floor(Math.random() * 100) + 5,
-  imageUrl: '',
-}));
-
+// 데이터는 store로 이동했으므로 여기서 삭제합니다.
 
 const MainPage = () => {
-  const [activeMainTab, setActiveMainTab] = useState('프로젝트');
+  // 1. store에서 필요한 모든 상태와 액션을 가져옵니다.
+  const {
+    allProjects,
+    allPersons,
+    activeMainTab,
+    projectFilterStates,
+    personFilterStates,
+    currentPage,
+    setActiveMainTab,
+    setProjectFilters,
+    setPersonFilters,
+    setCurrentPage,
+  } = useMainPageStore();
 
-  const [projectFilterStates, setProjectFilterStates] = useState({
-    activeProjectSubTab: '개발',
-    activeProjectDetailTag: null,
-  });
-  const [personFilterStates, setPersonFilterStates] = useState({
-    activePersonJobCategory: '전체',
-    activePersonActivityCategory: '전체',
-  });
-
-  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = activeMainTab === '프로젝트' ? 16 : 8;
 
+  // useMemo를 사용한 필터링 로직은 그대로 유지합니다.
   const filteredItems = useMemo(() => {
-    let itemsToDisplay = [];
     if (activeMainTab === '프로젝트') {
-      itemsToDisplay = projectItemsData;
-      // TODO: projectFilterStates를 사용하여 실제 필터링 로직 구현
-      // 예: return projectItemsData.filter(item => item.category === projectFilterStates.activeProjectSubTab);
+      let filtered = allProjects;
+
+      // 1. 서브 카테고리 필터링
+      if (projectFilterStates.activeProjectSubTab !== '전체') {
+        filtered = filtered.filter(item => item.subCategory === projectFilterStates.activeProjectSubTab);
+      }
+
+      // 2. 상세 태그 필터링
+      if (projectFilterStates.activeProjectDetailTag) {
+        filtered = filtered.filter(item => item.detailTags.includes(projectFilterStates.activeProjectDetailTag));
+      }
+      
+      return filtered;
+
     } else if (activeMainTab === '인물') {
-      itemsToDisplay = personItemsData;
-      // TODO: personFilterStates를 사용하여 실제 필터링 로직 구현
+      let filtered = allPersons;
+
+      // 1. 직군 필터링
+      if (personFilterStates.activePersonJobCategory !== '전체') {
+        filtered = filtered.filter(item => item.jobCategory === personFilterStates.activePersonJobCategory);
+      }
+      
+      // 2. 활동 분야 필터링
+      if (personFilterStates.activePersonActivityCategory !== '전체') {
+        filtered = filtered.filter(item => item.activityCategory === personFilterStates.activePersonActivityCategory);
+      }
+      
+      return filtered;
     }
-    return itemsToDisplay;
-  }, [activeMainTab, projectFilterStates, personFilterStates]); // 탭이나 필터가 변경될 때만 재계산
+    return [];
+  }, [activeMainTab, projectFilterStates, personFilterStates, allProjects, allPersons]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeMainTab, projectFilterStates, personFilterStates]);
+  // 페이지 리셋 로직은 store의 액션 안으로 이동했으므로 useEffect는 필요 없습니다.
 
+  // 렌더링에 필요한 현재 페이지 아이템들 계산
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
-
-  const handleMainTabChange = (tabName) => {
-    setActiveMainTab(tabName);
-    // 페이지 리셋은 useEffect가 담당하므로 여기서 호출할 필요 없음
-    if (tabName === '프로젝트') {
-      setProjectFilterStates({ activeProjectSubTab: '개발', activeProjectDetailTag: null });
-    } else if (tabName === '인물') {
-      setPersonFilterStates({ activePersonJobCategory: '전체', activePersonActivityCategory: '전체' });
-    }
-  };
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -89,13 +85,15 @@ const MainPage = () => {
     <PageContainer>
       <PortfolioSectionHeader />
       <FeaturedPortfolios />
+      
+      {/* 2. 자식 컴포넌트에 store의 상태와 액션을 직접 전달합니다. */}
       <FilterSection
         activeMainTab={activeMainTab}
-        onMainTabChange={handleMainTabChange}
+        onMainTabChange={setActiveMainTab}
         projectFilterStates={projectFilterStates}
-        onProjectFilterChange={setProjectFilterStates}
+        onProjectFilterChange={setProjectFilters}
         personFilterStates={personFilterStates}
-        onPersonFilterChange={setPersonFilterStates}
+        onPersonFilterChange={setPersonFilters}
       />
       <PortfolioList
         items={currentItems}

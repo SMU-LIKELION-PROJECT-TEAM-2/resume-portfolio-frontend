@@ -1,6 +1,7 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, forwardRef } from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const Header = styled.div`
   display: flex;
@@ -119,18 +120,19 @@ const CloseIcon = () => (
   </svg>
 );
 
-const TechStack = forwardRef((props, ref) => {
-  const initialSkills = [
-    'Adobe Photoshop',
-    'Adobe Premiere Pro',
-    'Adobe Illustrator',
-  ];
+const TechStack = () => {
+  // 4. skills 데이터는 store에서, inputValue는 지역 state로 관리합니다.
+  const skills = useEditorStore((state) => state.techStack);
+  const setSectionData = useEditorStore((state) => state.setSectionData);
+  
+  const [inputValue, setInputValue] = useState(''); // 이 지역 state는 그대로 둡니다.
 
-  const [skills, setSkills] = useState(initialSkills);
-  const [inputValue, setInputValue] = useState('');
+  // initialSkills 배열은 store로 이동했으므로 여기서 삭제합니다.
 
+  // 5. 핸들러 함수들이 setSectionData를 호출하도록 수정합니다.
   const handleRemoveSkill = (indexToRemove) => {
-    setSkills(skills.filter((_, index) => index !== indexToRemove));
+    const newSkills = skills.filter((_, index) => index !== indexToRemove);
+    setSectionData('techStack', newSkills);
   };
 
   const handleInputChange = (e) => {
@@ -140,16 +142,11 @@ const TechStack = forwardRef((props, ref) => {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && inputValue.trim() !== '' && skills.length < 20) {
       e.preventDefault();
-      setSkills([...skills, inputValue.trim()]);
-      setInputValue('');
+      const newSkills = [...skills, inputValue.trim()];
+      setSectionData('techStack', newSkills);
+      setInputValue(''); // 입력창 비우기
     }
   };
-
-  useImperativeHandle(ref, () => ({
-    getComponentData: () => {
-      return skills;
-    }
-  }));
 
   return (
     <SectionContainer>
@@ -166,7 +163,7 @@ const TechStack = forwardRef((props, ref) => {
         <InputWrapper>
           <StyledInput
             type="text"
-            placeholder="기술·스킬 검색"
+            placeholder="기술·스킬 검색 후 Enter"
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
@@ -177,6 +174,7 @@ const TechStack = forwardRef((props, ref) => {
         </InputWrapper>
 
         <TagContainer>
+          {/* store에서 가져온 skills 데이터를 렌더링합니다. */}
           {skills.map((skill, index) => (
             <SkillTag key={index}>
               {skill}
@@ -189,6 +187,6 @@ const TechStack = forwardRef((props, ref) => {
       </SkillsSection>
     </SectionContainer>
   );
-});
+};
 
 export default TechStack;

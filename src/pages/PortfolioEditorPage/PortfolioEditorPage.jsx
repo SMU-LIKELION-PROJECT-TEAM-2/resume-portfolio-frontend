@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import PortfolioEditorPageLayout from '../../Layout/PortfolioEditorPageLayout';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import useEditorStore from '../../stores/editorStore';
 
 import ActionBar from '../../components/PortfolioEditorPage/ActionBar';
 import ResumeTitleInput from '../../components/PortfolioEditorPage/ResumeTitleInput';
@@ -18,44 +19,23 @@ import SelfIntroduction from '../../components/PortfolioEditorPage/form/SelfIntr
 
 import Guide from '../../components/PortfolioEditorPage/Guide';
 
-const RESUME_SECTIONS_CONFIG = [
-  { id: 'basicInfo', name: '기본 정보', isRequired: true, component: <BasicInfo /> },
-  { id: 'techStack', name: '기술 스택', isRequired: false, component: <TechStack /> },
-  { id: 'workExperience', name: '경력', isRequired: false, component: <WorkExperience /> },
-  { id: 'projectExperience', name: '프로젝트', isRequired: false, component: <ProjectExperience /> },
-  { id: 'portfolio', name: '포트폴리오', isRequired: false, component: <Portfolio /> },
-  { id: 'education', name: '학력', isRequired: false, component: <Education /> },
-  { id: 'extracurricular', name: '대외활동', isRequired: false, component: <Extracurricular /> },
-  { id: 'certification', name: '자격증', isRequired: false, component: <Certification /> },
-  { id: 'foreignLanguage', name: '외국어', isRequired: false, component: <ForeignLanguage /> },
-  { id: 'selfIntroduction', name: '자기소개', isRequired: false, component: <SelfIntroduction /> }
-];
-
 const PortfolioEditorPage = () => {
-  const [resumeTitle, setResumeTitle] = useState('');
+  const {
+    title,
+    visibleSections,
+    setTitle,
+    toggleSectionVisibility,
+    ...allSectionData // 나머지 모든 섹션 데이터 (basicInfo, education 등)
+  } = useEditorStore();
 
-  const [visibleSections, setVisibleSections] = useState(
-    RESUME_SECTIONS_CONFIG.reduce((acc, section) => {
-      acc[section.id] = true;
-      return acc;
-    }, {})
-  );
+  // sectionRefs는 데이터 수집용이 아니므로 제거
+  const resumeContentRef = useRef(null); // PDF 생성용 ref는 유지
 
-  const sectionRefs = useRef({});
-  const resumeContentRef = useRef(null);
-
+  // 2. 데이터 수집 함수가 매우 간단해짐
   const gatherAllData = () => {
-    const allData = {};
-    for (const sectionId in sectionRefs.current) {
-      const sectionRef = sectionRefs.current[sectionId];
-      if (sectionRef && typeof sectionRef.getComponentData === 'function') {
-        allData[sectionId] = sectionRef.getComponentData();
-      }
-    }
-    return {
-        title: resumeTitle,
-        ...allData
-    };
+    // 이미 store에 모든 데이터가 있으므로, 필요한 것만 골라서 반환
+    const { title, ...sections } = useEditorStore.getState();
+    return { title, ...sections };
   };
 
   const handleTempSave = () => {
@@ -110,7 +90,7 @@ const PortfolioEditorPage = () => {
         heightLeft -= pageHeight;
       }
 
-      pdf.save(`${resumeTitle || '새로운 이력서'}.pdf`);
+      pdf.save(`${title || '새로운 이력서'}.pdf`);
 
     } catch (error) {
       console.error("PDF 생성 중 오류 발생:", error);
@@ -118,22 +98,23 @@ const PortfolioEditorPage = () => {
     }
   };
 
-  const toggleSectionVisibility = (sectionId) => {
-    const sectionConf = RESUME_SECTIONS_CONFIG.find(s => s.id === sectionId);
-    if (sectionConf && sectionConf.isRequired) return;
-
-    setVisibleSections(prev => ({
-      ...prev,
-      [sectionId]: !prev[sectionId],
-    }));
-  };
+  const RESUME_SECTIONS_CONFIG = [
+    { id: 'basicInfo', name: '기본 정보', isRequired: true, component: <BasicInfo /> },
+    { id: 'techStack', name: '기술 스택', isRequired: false, component: <TechStack /> },
+    { id: 'workExperience', name: '경력', isRequired: false, component: <WorkExperience /> },
+    { id: 'projectExperience', name: '프로젝트', isRequired: false, component: <ProjectExperience /> },
+    { id: 'portfolio', name: '포트폴리오', isRequired: false, component: <Portfolio /> },
+    { id: 'education', name: '학력', isRequired: false, component: <Education /> },
+    { id: 'extracurricular', name: '대외활동', isRequired: false, component: <Extracurricular /> },
+    { id: 'certification', name: '자격증', isRequired: false, component: <Certification /> },
+    { id: 'foreignLanguage', name: '외국어', isRequired: false, component: <ForeignLanguage /> },
+    { id: 'selfIntroduction', name: '자기소개', isRequired: false, component: <SelfIntroduction /> }
+  ];
 
   const sectionsToRender = RESUME_SECTIONS_CONFIG
-    .filter(section => section.isRequired || visibleSections[section.id])
-    .map(section => React.cloneElement(section.component, { 
-      key: section.id,
-      ref: (el) => (sectionRefs.current[section.id] = el)
-    }));
+    .filter(section => visibleSections[section.id])
+    .map(section => React.cloneElement(section.component, { key: section.id }));
+    
     
   return (
     <PortfolioEditorPageLayout
@@ -146,15 +127,16 @@ const PortfolioEditorPage = () => {
         />
       }
       headerContent={
+        // setTitle 액션을 직접 전달
         <ResumeTitleInput 
-          value={resumeTitle} 
-          onChange={(e) => setResumeTitle(e.target.value)} 
+          value={title} 
+          onChange={(e) => setTitle(e.target.value)} 
         />
       }
-      resumeContentRef={resumeContentRef}
       resumeSections={sectionsToRender}
       guide={
         <Guide
+          // config와 상태, 액션을 Guide 컴포넌트에 전달
           sections={RESUME_SECTIONS_CONFIG}
           visibleSections={visibleSections}
           onToggle={toggleSectionVisibility}

@@ -1,8 +1,9 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { forwardRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const MainHeader = styled.div`
     display: flex;
@@ -184,47 +185,43 @@ const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
   </DateInputWrapper>
 ));
 
-const Education = forwardRef((props, ref) => {
-    const [educations, setEducations] = useState([
-        {
-            id: 1, type: '', institution: '', major: '', 
-            status: '', startDate: null, endDate: null
-        }
-    ]);
+const Education = () => {
+    // 4. useState 대신 store에서 상태와 액션을 가져옵니다.
+    const educations = useEditorStore((state) => state.education);
+    const setSectionData = useEditorStore((state) => state.setSectionData);
 
     const addEducation = () => {
-        if (educations.length < 20) {
-            setEducations([...educations, { 
-                id: Date.now(), type: '', institution: '', major: '', 
-                status: '', startDate: null, endDate: null 
-            }]);
-        } else {
+        if (educations.length >= 20) {
             alert('최대 20개까지 등록 가능합니다.');
+            return;
         }
+        // 새로운 배열을 만들어 store에 업데이트 요청
+        const newEducations = [...educations, { 
+            id: Date.now(), type: '', institution: '', major: '', 
+            status: '', startDate: null, endDate: null 
+        }];
+        setSectionData('education', newEducations);
     };
 
     const deleteEducation = (id) => {
-        setEducations(educations.filter(edu => edu.id !== id));
+        const newEducations = educations.filter(edu => edu.id !== id);
+        setSectionData('education', newEducations);
     };
 
-    const handleEducationChange = (id, e) => {
+    const handleInputChange = (id, e) => {
         const { name, value } = e.target;
-        setEducations(educations.map(edu => 
+        const newEducations = educations.map(edu => 
             edu.id === id ? { ...edu, [name]: value } : edu
-        ));
+        );
+        setSectionData('education', newEducations);
     };
 
     const handleDateChange = (id, fieldName, date) => {
-        setEducations(educations.map(edu =>
+        const newEducations = educations.map(edu =>
             edu.id === id ? { ...edu, [fieldName]: date } : edu
-        ));
+        );
+        setSectionData('education', newEducations);
     };
-
-    useImperativeHandle(ref, () => ({
-        getComponentData: () => {
-        return educations;
-        }
-    }));
 
     return (
         <SectionContainer>
@@ -241,6 +238,7 @@ const Education = forwardRef((props, ref) => {
                     </IconButton>
                 </SectionHeader>
 
+                {/* JSX 렌더링 부분은 동일하지만, 이제 store의 데이터를 사용합니다. */}
                 {educations.map((edu, index) => (
                     <EducationRow key={edu.id}>
                         <RowHeader>
@@ -253,7 +251,7 @@ const Education = forwardRef((props, ref) => {
                         <FieldsGrid>
                             <FieldWrapper>
                                 <FieldLabel>유형</FieldLabel>
-                                <StyledSelect name="type" value={edu.type} onChange={e => handleEducationChange(edu.id, e)}>
+                                <StyledSelect name="type" value={edu.type} onChange={e => handleInputChange(edu.id, e)}>
                                     <option value="" disabled>유형을 선택해주세요</option>
                                     <option value="highschool">고등학교</option>
                                     <option value="university">대학교</option>
@@ -264,7 +262,7 @@ const Education = forwardRef((props, ref) => {
 
                             <FieldWrapper>
                                 <FieldLabel>재학 상태</FieldLabel>
-                                <StyledSelect name="status" value={edu.status} onChange={e => handleEducationChange(edu.id, e)}>
+                                <StyledSelect name="status" value={edu.status} onChange={e => handleInputChange(edu.id, e)}>
                                     <option value="" disabled>상태를 선택해주세요</option>
                                     <option value="attending">재학중</option>
                                     <option value="leave">휴학</option>
@@ -277,7 +275,7 @@ const Education = forwardRef((props, ref) => {
                                 <FieldLabel>소속/기관</FieldLabel>
                                 <StyledInput
                                     type="text" name="institution" value={edu.institution}
-                                    onChange={e => handleEducationChange(edu.id, e)}
+                                    onChange={e => handleInputChange(edu.id, e)}
                                     placeholder="소속/기관이 없을 경우 개인 또는 기타로 입력해주세요"
                                 />
                             </FieldWrapper>
@@ -286,10 +284,10 @@ const Education = forwardRef((props, ref) => {
                                 <FieldLabel>전공명/전공 계열</FieldLabel>
                                 <StyledInput
                                     type="text" name="major" value={edu.major}
-                                    onChange={e => handleEducationChange(edu.id, e)}
+                                    onChange={e => handleInputChange(edu.id, e)}
                                     placeholder="전공을 입력해주세요"
                                 />
-                            </FieldWrapper>
+                             </FieldWrapper>
                             
                             <FieldWrapper className="full-width">
                                 <FieldLabel>재학 기간</FieldLabel>
@@ -326,6 +324,6 @@ const Education = forwardRef((props, ref) => {
             </SectionWrapper>
         </SectionContainer>
     );
-});
+};
 
 export default Education;

@@ -1,8 +1,9 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { forwardRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const MainHeader = styled.header`
   display: flex;
@@ -222,12 +223,16 @@ const createNewExperience = () => ({
   duties: '',
 });
 
-const WorkExperience = forwardRef((props, ref) => {
-  const [experiences, setExperiences] = useState([createNewExperience()]);
+const WorkExperience = () => {
+  // 4. useState 대신 store에서 상태와 액션을 가져옵니다.
+  const experiences = useEditorStore((state) => state.workExperience);
+  const setSectionData = useEditorStore((state) => state.setSectionData);
 
+  // 5. 모든 핸들러 함수가 setSectionData를 호출하도록 수정합니다.
   const addExperience = () => {
     if (experiences.length < 40) {
-      setExperiences([...experiences, createNewExperience()]);
+      const newExperiences = [...experiences, createNewExperience()];
+      setSectionData('workExperience', newExperiences);
     } else {
       alert('경력은 최대 40개까지 등록할 수 있습니다.');
     }
@@ -235,9 +240,10 @@ const WorkExperience = forwardRef((props, ref) => {
 
   const deleteExperience = (id) => {
     if (experiences.length > 1) {
-        setExperiences(experiences.filter(exp => exp.id !== id));
+      const newExperiences = experiences.filter(exp => exp.id !== id);
+      setSectionData('workExperience', newExperiences);
     } else {
-        alert('최소 1개의 경력 정보가 필요합니다.');
+      alert('최소 1개의 경력 정보가 필요합니다.');
     }
   };
   
@@ -245,7 +251,7 @@ const WorkExperience = forwardRef((props, ref) => {
     const { name, value, type, checked } = e.target;
     const val = type === 'checkbox' ? checked : value;
 
-    setExperiences(experiences.map(exp => {
+    const newExperiences = experiences.map(exp => {
       if (exp.id === id) {
         if (name === 'isCurrent' && checked) {
           return { ...exp, isCurrent: true, endDate: null };
@@ -253,20 +259,16 @@ const WorkExperience = forwardRef((props, ref) => {
         return { ...exp, [name]: val };
       }
       return exp;
-    }));
+    });
+    setSectionData('workExperience', newExperiences);
   };
 
   const handleDateChange = (id, fieldName, date) => {
-    setExperiences(experiences.map(exp =>
+    const newExperiences = experiences.map(exp =>
       exp.id === id ? { ...exp, [fieldName]: date } : exp
-    ));
+    );
+    setSectionData('workExperience', newExperiences);
   };
-
-  useImperativeHandle(ref, () => ({
-    getComponentData: () => {
-        return experiences;
-    }
-  }));
 
   return (
     <SectionContainer>
@@ -282,19 +284,10 @@ const WorkExperience = forwardRef((props, ref) => {
 
       {experiences.map((exp, index) => (
         <ExperienceBlock key={exp.id}>
-          <BlockHeader>
-            <BlockTitle>경력 {index + 1}</BlockTitle>
-            <IconButton onClick={() => deleteExperience(exp.id)} aria-label={`경력 ${index + 1} 삭제`}>
-              <DeleteIcon />
-            </IconButton>
-          </BlockHeader>
-          
-          <FormRow>
-            <FormLabel>회사명</FormLabel>
-            <StyledInput name="company" value={exp.company} onChange={(e) => handleInputChange(exp.id, e)} placeholder="회사명을 입력해주세요" />
-          </FormRow>
+          <BlockHeader><BlockTitle>경력 {index + 1}</BlockTitle><IconButton onClick={() => deleteExperience(exp.id)}><DeleteIcon /></IconButton></BlockHeader>
+            <FormRow><FormLabel>회사명</FormLabel><StyledInput name="company" value={exp.company} onChange={(e) => handleInputChange(exp.id, e)} placeholder="회사명을 입력해주세요" /></FormRow>
 
-          <FormRow>
+            <FormRow>
              <FormLabel>재직 기간</FormLabel>
              <DateRow>
                 <DatePicker
@@ -327,7 +320,7 @@ const WorkExperience = forwardRef((props, ref) => {
                     <label htmlFor={`isCurrent-${exp.id}`}>재직중</label>
                 </CheckboxWrapper>
              </DateRow>
-          </FormRow>
+            </FormRow>
           
           <FormRow>
             <FormLabel>직책</FormLabel>
@@ -362,6 +355,6 @@ const WorkExperience = forwardRef((props, ref) => {
       ))}
     </SectionContainer>
   );
-});
+};
 
 export default WorkExperience;

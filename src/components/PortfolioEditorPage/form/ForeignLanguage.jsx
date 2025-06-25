@@ -1,6 +1,7 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const MainHeader = styled.div`
     display: flex;
@@ -144,38 +145,36 @@ const DeleteIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H5H21" stroke="#868e96" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="#868e96" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
 );
 
-const ForeignLanguage = forwardRef((props, ref) => {
-    const [languages, setLanguages] = useState([
-        { id: 1, name: '', level: '' }
-    ]);
+const ForeignLanguage = () => {
+    // 4. useState 대신 store에서 상태와 액션을 가져옵니다.
+    const languages = useEditorStore((state) => state.foreignLanguage);
+    const setSectionData = useEditorStore((state) => state.setSectionData);
 
     const addLanguage = () => {
         if (languages.length >= 10) {
             alert('최대 10개까지 등록 가능합니다.');
             return;
         }
-        setLanguages([
+        // 새로운 배열을 만들어 store에 업데이트 요청
+        const newLanguages = [
             ...languages,
             { id: Date.now(), name: '', level: '' }
-        ]);
+        ];
+        setSectionData('foreignLanguage', newLanguages);
     };
 
     const deleteLanguage = (id) => {
-        setLanguages(languages.filter(lang => lang.id !== id));
+        const newLanguages = languages.filter(lang => lang.id !== id);
+        setSectionData('foreignLanguage', newLanguages);
     };
 
     const handleLanguageChange = (id, e) => {
         const { name, value } = e.target;
-        setLanguages(languages.map(lang => 
+        const newLanguages = languages.map(lang => 
             lang.id === id ? { ...lang, [name]: value } : lang
-        ));
+        );
+        setSectionData('foreignLanguage', newLanguages);
     };
-
-    useImperativeHandle(ref, () => ({
-        getComponentData: () => {
-            return languages;
-        }
-    }));
 
     return (
         <SectionContainer>
@@ -185,6 +184,7 @@ const ForeignLanguage = forwardRef((props, ref) => {
             </MainHeader>
 
             <SectionWrapper>
+                {/* JSX 렌더링 부분은 동일하지만, 이제 store의 데이터를 사용합니다. */}
                 {languages.map((lang, index) => (
                     <LanguageRow key={lang.id}>
                         <RowHeader>
@@ -229,6 +229,6 @@ const ForeignLanguage = forwardRef((props, ref) => {
             </SectionWrapper>
         </SectionContainer>
     );
-});
+};
 
 export default ForeignLanguage;

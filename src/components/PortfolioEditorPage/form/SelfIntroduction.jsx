@@ -1,6 +1,7 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 import { SectionContainer } from '../sharedStyles';
+import useEditorStore from '../../../stores/editorStore';
 
 const MainHeader = styled.div`
     display: flex;
@@ -55,18 +56,15 @@ const FieldLabel = styled.label`
     color: #343a40;
 `;
 
-const SelfIntroduction = forwardRef((props, ref) => {
-    const [content, setContent] = useState('');
+const SelfIntroduction = () => {
+    // 4. useState 대신 store에서 상태와 액션을 가져옵니다.
+    const content = useEditorStore((state) => state.selfIntroduction);
+    const setSectionData = useEditorStore((state) => state.setSectionData);
 
     const handleContentChange = (e) => {
-        setContent(e.target.value);
+        // 5. setState 대신 store의 액션을 호출합니다.
+        setSectionData('selfIntroduction', e.target.value);
     };
-
-    useImperativeHandle(ref, () => ({
-        getComponentData: () => {
-            return content;
-        }
-    }));
 
     return (
         <SectionContainer>
@@ -88,6 +86,6 @@ const SelfIntroduction = forwardRef((props, ref) => {
             </SectionWrapper>
         </SectionContainer>
     );
-});
+};
 
 export default SelfIntroduction;
