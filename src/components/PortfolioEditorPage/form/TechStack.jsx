@@ -121,15 +121,11 @@ const CloseIcon = () => (
 );
 
 const TechStack = () => {
-  // 4. skills 데이터는 store에서, inputValue는 지역 state로 관리합니다.
   const skills = useEditorStore((state) => state.techStack);
   const setSectionData = useEditorStore((state) => state.setSectionData);
   
-  const [inputValue, setInputValue] = useState(''); // 이 지역 state는 그대로 둡니다.
+  const [inputValue, setInputValue] = useState('');
 
-  // initialSkills 배열은 store로 이동했으므로 여기서 삭제합니다.
-
-  // 5. 핸들러 함수들이 setSectionData를 호출하도록 수정합니다.
   const handleRemoveSkill = (indexToRemove) => {
     const newSkills = skills.filter((_, index) => index !== indexToRemove);
     setSectionData('techStack', newSkills);
@@ -144,7 +140,7 @@ const TechStack = () => {
       e.preventDefault();
       const newSkills = [...skills, inputValue.trim()];
       setSectionData('techStack', newSkills);
-      setInputValue(''); // 입력창 비우기
+      setInputValue('');
     }
   };
 
@@ -174,7 +170,6 @@ const TechStack = () => {
         </InputWrapper>
 
         <TagContainer>
-          {/* store에서 가져온 skills 데이터를 렌더링합니다. */}
           {skills.map((skill, index) => (
             <SkillTag key={index}>
               {skill}

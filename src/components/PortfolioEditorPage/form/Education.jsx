@@ -186,7 +186,6 @@ const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
 ));
 
 const Education = () => {
-    // 4. useState 대신 store에서 상태와 액션을 가져옵니다.
     const educations = useEditorStore((state) => state.education);
     const setSectionData = useEditorStore((state) => state.setSectionData);
 
@@ -195,7 +194,6 @@ const Education = () => {
             alert('최대 20개까지 등록 가능합니다.');
             return;
         }
-        // 새로운 배열을 만들어 store에 업데이트 요청
         const newEducations = [...educations, { 
             id: Date.now(), type: '', institution: '', major: '', 
             status: '', startDate: null, endDate: null 
@@ -238,7 +236,6 @@ const Education = () => {
                     </IconButton>
                 </SectionHeader>
 
-                {/* JSX 렌더링 부분은 동일하지만, 이제 store의 데이터를 사용합니다. */}
                 {educations.map((edu, index) => (
                     <EducationRow key={edu.id}>
                         <RowHeader>

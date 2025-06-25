@@ -224,11 +224,9 @@ const createNewExperience = () => ({
 });
 
 const WorkExperience = () => {
-  // 4. useState 대신 store에서 상태와 액션을 가져옵니다.
   const experiences = useEditorStore((state) => state.workExperience);
   const setSectionData = useEditorStore((state) => state.setSectionData);
 
-  // 5. 모든 핸들러 함수가 setSectionData를 호출하도록 수정합니다.
   const addExperience = () => {
     if (experiences.length < 40) {
       const newExperiences = [...experiences, createNewExperience()];

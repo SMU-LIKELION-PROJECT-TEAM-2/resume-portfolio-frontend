@@ -149,7 +149,6 @@ const CalendarIcon = () => (
 );
 
 const Certification = () => {
-    // 4. useState 대신 store에서 상태와 액션을 가져옵니다.
     const certifications = useEditorStore((state) => state.certification);
     const setSectionData = useEditorStore((state) => state.setSectionData);
 
@@ -158,10 +157,8 @@ const Certification = () => {
             alert('최대 30개까지 등록 가능합니다.');
             return;
         }
-        // 새로운 배열을 만들어 store에 업데이트 요청
         const newCertifications = [
             ...certifications,
-            // DatePicker를 사용한다면 acquisitionDate는 null로 초기화해야 합니다.
             { id: Date.now(), name: '', score: '', issuingOrg: '', acquisitionDate: null }
         ];
         setSectionData('certification', newCertifications);
@@ -232,7 +229,6 @@ const Certification = () => {
                                 />
                             </FieldWrapper>
 
-                            {/* 만약 DatePicker를 사용한다면 이 부분을 DatePicker 컴포넌트로 교체해야 합니다. */}
                             <FieldWrapper className="full-width">
                                 <FieldLabel>취득월</FieldLabel>
                                 <DateInputWrapper>

@@ -224,15 +224,12 @@ const SearchIcon = () => (
 );
 
 const BasicInfo = () => {
-  // 4. store에서 전역 상태와 액션을 가져옴
   const basicInfo = useEditorStore((state) => state.basicInfo);
   const setSectionData = useEditorStore((state) => state.setSectionData);
 
-  // 5. 이미지 미리보기는 이 컴포넌트에서만 사용하므로 지역 state로 유지
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
   
-  // 6. 핸들러들이 setBasicInfo 대신 setSectionData를 호출하도록 수정
   const handleChange = (e) => {
     const { name, value } = e.target;
     const newBasicInfo = { ...basicInfo, [name]: value };
@@ -254,7 +251,6 @@ const BasicInfo = () => {
     if (file) {
       const newBasicInfo = { ...basicInfo, profileImage: file };
       setSectionData('basicInfo', newBasicInfo);
-      // 미리보기 URL 생성 로직은 지역 state를 사용하므로 그대로 둡니다.
       if (imagePreview) URL.revokeObjectURL(imagePreview);
       setImagePreview(URL.createObjectURL(file));
     }
@@ -269,9 +265,7 @@ const BasicInfo = () => {
     setImagePreview(null);
   };
   
-  // 7. 전역 상태와 지역 미리보기 상태를 동기화하는 useEffect 추가
   useEffect(() => {
-    // store의 profileImage가 변경되었을 때(예: 데이터 불러오기), 미리보기도 업데이트
     if (basicInfo.profileImage && typeof basicInfo.profileImage !== 'string') {
         const newPreview = URL.createObjectURL(basicInfo.profileImage);
         setImagePreview(newPreview);

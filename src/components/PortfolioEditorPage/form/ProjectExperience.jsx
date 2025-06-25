@@ -191,11 +191,9 @@ const createNewProject = () => ({
 });
 
 const ProjectExperience = () => {
-  // 4. useState 대신 store에서 상태와 액션을 가져옵니다.
   const projects = useEditorStore((state) => state.projectExperience);
   const setSectionData = useEditorStore((state) => state.setSectionData);
 
-  // 5. 모든 핸들러 함수가 setSectionData를 호출하도록 수정합니다.
   const addProject = () => {
     if (projects.length < 40) {
       const newProjects = [...projects, createNewProject()];

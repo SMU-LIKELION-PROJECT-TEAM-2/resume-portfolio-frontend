@@ -146,7 +146,6 @@ const DeleteIcon = () => (
 );
 
 const ForeignLanguage = () => {
-    // 4. useState 대신 store에서 상태와 액션을 가져옵니다.
     const languages = useEditorStore((state) => state.foreignLanguage);
     const setSectionData = useEditorStore((state) => state.setSectionData);
 
@@ -155,7 +154,6 @@ const ForeignLanguage = () => {
             alert('최대 10개까지 등록 가능합니다.');
             return;
         }
-        // 새로운 배열을 만들어 store에 업데이트 요청
         const newLanguages = [
             ...languages,
             { id: Date.now(), name: '', level: '' }
@@ -184,7 +182,6 @@ const ForeignLanguage = () => {
             </MainHeader>
 
             <SectionWrapper>
-                {/* JSX 렌더링 부분은 동일하지만, 이제 store의 데이터를 사용합니다. */}
                 {languages.map((lang, index) => (
                     <LanguageRow key={lang.id}>
                         <RowHeader>

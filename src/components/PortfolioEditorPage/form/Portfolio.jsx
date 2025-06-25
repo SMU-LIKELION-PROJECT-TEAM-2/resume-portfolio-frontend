@@ -144,15 +144,12 @@ const DeleteIcon = () => (
 );
 
 const Portfolio = () => {
-    // 4. useState 대신 store에서 portfolio 객체와 액션을 가져옵니다.
     const portfolioData = useEditorStore((state) => state.portfolio);
     const setSectionData = useEditorStore((state) => state.setSectionData);
     
-    // 5. 모든 핸들러 함수가 setSectionData를 호출하도록 수정합니다.
     const addUrl = () => {
         if (portfolioData.urls.length < 10) {
             const newUrls = [...portfolioData.urls, { id: Date.now(), name: '', link: '' }];
-            // urls를 업데이트하면서 기존 files 데이터는 유지합니다.
             setSectionData('portfolio', { ...portfolioData, urls: newUrls });
         }
     };
@@ -169,7 +166,6 @@ const Portfolio = () => {
     const addFile = () => {
         if (portfolioData.files.length < 10) {
             const newFiles = [...portfolioData.files, { id: Date.now(), fileObject: null }];
-            // files를 업데이트하면서 기존 urls 데이터는 유지합니다.
             setSectionData('portfolio', { ...portfolioData, files: newFiles });
         }
     };
@@ -192,13 +188,12 @@ const Portfolio = () => {
                 <MainBadge>각각 최대 10개 등록 가능</MainBadge>
             </MainHeader>
 
-            {/* --- URL 섹션 --- */}
             <SectionWrapper>
                 <SectionHeader>
                     <SectionTitle>URL</SectionTitle>
                     <IconButton onClick={addUrl} aria-label="URL 추가"><AddIcon /></IconButton>
                 </SectionHeader>
-                {/* 7. portfolioData.urls를 사용하여 렌더링 */}
+
                 {portfolioData.urls.map((url, index) => (
                     <UrlRow key={url.id}>
                         <RowHeader>
@@ -213,7 +208,6 @@ const Portfolio = () => {
             
             <Divider />
 
-            {/* --- 첨부 파일 섹션 --- */}
             <SectionWrapper>
                 <SectionHeader>
                     <SectionTitle>첨부 파일</SectionTitle>
@@ -221,7 +215,6 @@ const Portfolio = () => {
                 </SectionHeader>
                 <Description>파일별 최대 10MB까지 업로드 가능 (확장자 : PDF, JPG, PNG)</Description>
                 
-                {/* 7. portfolioData.files를 사용하여 렌더링 */}
                 {portfolioData.files.map((file, index) => (
                     <FileRow key={file.id}>
                         <RowLabel>파일 {index + 1}</RowLabel>

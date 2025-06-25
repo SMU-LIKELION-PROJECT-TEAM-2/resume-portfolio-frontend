@@ -57,12 +57,10 @@ const FieldLabel = styled.label`
 `;
 
 const SelfIntroduction = () => {
-    // 4. useState 대신 store에서 상태와 액션을 가져옵니다.
     const content = useEditorStore((state) => state.selfIntroduction);
     const setSectionData = useEditorStore((state) => state.setSectionData);
 
     const handleContentChange = (e) => {
-        // 5. setState 대신 store의 액션을 호출합니다.
         setSectionData('selfIntroduction', e.target.value);
     };
 

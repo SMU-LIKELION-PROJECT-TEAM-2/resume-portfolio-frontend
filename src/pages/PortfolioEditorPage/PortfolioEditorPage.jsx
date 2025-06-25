@@ -25,15 +25,12 @@ const PortfolioEditorPage = () => {
     visibleSections,
     setTitle,
     toggleSectionVisibility,
-    ...allSectionData // 나머지 모든 섹션 데이터 (basicInfo, education 등)
+    ...allSectionData
   } = useEditorStore();
 
-  // sectionRefs는 데이터 수집용이 아니므로 제거
-  const resumeContentRef = useRef(null); // PDF 생성용 ref는 유지
+  const resumeContentRef = useRef(null);
 
-  // 2. 데이터 수집 함수가 매우 간단해짐
   const gatherAllData = () => {
-    // 이미 store에 모든 데이터가 있으므로, 필요한 것만 골라서 반환
     const { title, ...sections } = useEditorStore.getState();
     return { title, ...sections };
   };
@@ -127,7 +124,6 @@ const PortfolioEditorPage = () => {
         />
       }
       headerContent={
-        // setTitle 액션을 직접 전달
         <ResumeTitleInput 
           value={title} 
           onChange={(e) => setTitle(e.target.value)} 
@@ -136,7 +132,6 @@ const PortfolioEditorPage = () => {
       resumeSections={sectionsToRender}
       guide={
         <Guide
-          // config와 상태, 액션을 Guide 컴포넌트에 전달
           sections={RESUME_SECTIONS_CONFIG}
           visibleSections={visibleSections}
           onToggle={toggleSectionVisibility}

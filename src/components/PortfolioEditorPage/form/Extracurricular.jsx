@@ -111,7 +111,7 @@ const DatePickerInput = styled(StyledInput)`
 
 const FieldsGrid = styled.div`
     display: grid;
-    grid-template-columns: 1fr; // 대외활동은 필드가 적어 1단으로 변경
+    grid-template-columns: 1fr;
     gap: 16px;
 
     .full-width {
@@ -181,7 +181,6 @@ const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
 ));
 
 const Extracurricular = () => {
-    // 4. useState 대신 store에서 상태와 액션을 가져옵니다.
     const activities = useEditorStore((state) => state.extracurricular);
     const setSectionData = useEditorStore((state) => state.setSectionData);
 
@@ -190,7 +189,6 @@ const Extracurricular = () => {
             alert('최대 30개까지 등록 가능합니다.');
             return;
         }
-        // 새로운 배열을 만들어 store에 업데이트 요청
         const newActivities = [
             ...activities,
             { id: Date.now(), name: '', organization: '', startDate: null, endDate: null, description: '' }
@@ -232,8 +230,7 @@ const Extracurricular = () => {
                         <AddIcon />
                     </IconButton>
                 </SectionHeader>
-
-                {/* JSX 렌더링 부분은 동일하지만, 이제 store의 데이터를 사용합니다. */}
+                
                 {activities.map((activity, index) => (
                     <ActivityRow key={activity.id}>
                         <RowHeader>
