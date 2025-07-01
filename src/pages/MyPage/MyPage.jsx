@@ -4,9 +4,7 @@ import MyPageMain from "../../components/MyPage/Index/MyPageMain";
 function MyPage() {
   return (
     <>
-      <Header />
       <MyPageMain />
-      <Footer />
     </>
   );
 }

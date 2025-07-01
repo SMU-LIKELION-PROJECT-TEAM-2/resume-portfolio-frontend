@@ -17,12 +17,10 @@ const Main = styled.main`
 const ProfileEdit = () => {
   return (
     <>
-      <Header />
       <Main>
         <DocumentEdit />
         <CareerEdit />
       </Main>
-      <Footer />
     </>
   );
 };

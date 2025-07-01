@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { NavLink } from "react-router-dom";
 
 const Aside = styled.aside`
-  width: 100px;
+  width: 140px;
   height: min-content;
   background-color: #f2f2f2;
   padding: 24px 24px 32px 24px;

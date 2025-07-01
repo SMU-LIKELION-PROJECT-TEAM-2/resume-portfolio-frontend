@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import CareerItem from "./CareerItem";
 
 const Layout = styled.div`
-  width: 281px;
+  width: 321px;
   background-color: #eeeeee;
   border-radius: 8px;
   margin-left: 140px;

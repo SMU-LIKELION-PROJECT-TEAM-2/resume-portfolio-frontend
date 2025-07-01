@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 
 const ProfileLayout = styled.div`
   background-color: #eeeeee;
-  width: 281px;
+  width: 321px;
   position: relative;
   z-index: 20;
   border-radius: 8px;

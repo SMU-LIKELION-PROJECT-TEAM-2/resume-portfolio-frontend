@@ -48,14 +48,12 @@ const Main = styled.main`
 const Community = () => {
   return (
     <>
-      <Header />
       <Layout>
         <Sidebar />
         <Main>
           <Outlet />
         </Main>
       </Layout>
-      <Footer />
     </>
   );
 };

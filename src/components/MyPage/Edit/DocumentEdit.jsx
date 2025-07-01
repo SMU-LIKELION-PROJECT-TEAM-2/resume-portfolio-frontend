@@ -103,7 +103,7 @@ const DocumentEdit = () => {
         </TextBox>
         <TextBox>
           자기소개
-          <TextArea rows={14} placeholder="본인에 대한 설명을 쓰는 칸입니다." />
+          <TextArea rows={12} placeholder="본인에 대한 설명을 쓰는 칸입니다." />
         </TextBox>
       </ProfileForm>
     </Layout>
