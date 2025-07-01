@@ -61,6 +61,7 @@ const TextBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  font-weight: bold;
 `;
 const Text = styled.input`
   border-radius: 10px;
@@ -75,6 +76,7 @@ const TextArea = styled.textarea`
   border: none;
   padding: 10px;
   font-size: 20px;
+  font-weight: bold;
 `;
 
 const DocumentEdit = () => {

@@ -40,13 +40,17 @@ const TextArea = styled.textarea`
   resize: none;
   padding: 20px;
   font-size: larger;
+  font-weight: bold;
 `;
 
-const InputDate = styled.div`
-  flex: 1;
-  height: 62px;
-  background-color: white;
+const InputDate = styled.input`
+  height: 40px;
+  width: 65%;
+  border: none;
   border-radius: 10px;
+  font-size: 16px;
+  background-color: white;
+  cursor: pointer;
 `;
 
 const EditButton = styled.button`
@@ -59,6 +63,17 @@ const EditButton = styled.button`
   font-size: 20px;
   font-weight: 500;
   cursor: pointer;
+`;
+
+const DateFrame = styled.div`
+  flex: 1;
+  height: 62px;
+  background-color: white;
+  border-radius: 10px;
+  padding-inline: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const CareerEdit = () => {
@@ -85,8 +100,14 @@ const CareerEdit = () => {
       </Detail>
       <h3>업무 기간</h3>
       <Period>
-        <InputDate></InputDate>
-        <InputDate></InputDate>
+        <DateFrame>
+          시작
+          <InputDate type="date" />
+        </DateFrame>
+        <DateFrame>
+          종료
+          <InputDate type="date" />
+        </DateFrame>
       </Period>
       <EditButton>수정 완료</EditButton>
     </Layout>
