@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../../components/Community/Index/Sidebar";
-import Footer from "../../Layout/Footer/Footer";
-import Header from "../../Layout/Header/Header";
 import styled from "@emotion/styled";
+import { useEffect } from "react";
+import { usePostStore } from "../../stores/usePostStroe";
 
-export const dummyPosts = Array.from({ length: 20 }, (_, i) => ({
+const dummyPosts = Array.from({ length: 20 }, (_, i) => ({
   id: i + 1,
   author: `사용자이름`,
   createdAt: `${19 - (i % 5)}시간 전`,
@@ -46,6 +46,11 @@ const Main = styled.main`
 `;
 
 const Community = () => {
+  const setPosts = usePostStore((state) => state.setPosts);
+
+  useEffect(() => {
+    setPosts(dummyPosts);
+  }, []);
   return (
     <>
       <Layout>

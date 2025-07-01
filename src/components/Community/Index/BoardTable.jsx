@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { dummyPosts } from "../../../pages/Community/Community";
 import BoardItem from "./BoardItem";
+import { usePostStore } from "../../../stores/usePostStroe";
 
 const BoardTable = () => {
+  const posts = usePostStore((state) => state.posts);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 8;
 
-  const totalPages = Math.ceil(dummyPosts.length / postsPerPage);
+  const totalPages = Math.ceil(posts.length / postsPerPage);
   const startIndex = (currentPage - 1) * postsPerPage;
-  const currentPosts = dummyPosts.slice(startIndex, startIndex + postsPerPage);
+  const currentPosts = posts.slice(startIndex, startIndex + postsPerPage);
   const emptyCount = postsPerPage - currentPosts.length;
   return (
     <main>

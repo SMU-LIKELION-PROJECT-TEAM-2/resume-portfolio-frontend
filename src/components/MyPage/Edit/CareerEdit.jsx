@@ -14,11 +14,13 @@ const Layout = styled.section`
 const Title = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 10px;
 `;
 
 const Detail = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 10px;
 `;
 
 const Period = styled.div`
