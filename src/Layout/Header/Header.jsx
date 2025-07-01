@@ -19,16 +19,26 @@ const Header = () => {
       </div>
       <div className="header-center">
         <div className="search-bar">
-          <input type="text" placeholder="검색어를 입력하세요" className="search-input" />
+          <input
+            type="text"
+            placeholder="검색어를 입력하세요"
+            className="search-input"
+          />
           <button type="button" className="search-button">
             <FaSearch />
           </button>
         </div>
       </div>
       <div className="header-right">
-        <button type="button" className="action-button share-work">내 작업 공유</button>
-        <button type="button" className="action-button login">로그인</button>
-        <button type="button" className="action-button signup">회원가입</button>
+        <button type="button" className="action-button share-work">
+          내 작업 공유
+        </button>
+        <button type="button" className="action-button login">
+          로그인
+        </button>
+        <button type="button" className="action-button signup">
+          회원가입
+        </button>
       </div>
     </header>
   );
