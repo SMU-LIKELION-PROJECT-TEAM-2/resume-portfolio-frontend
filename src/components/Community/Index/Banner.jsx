@@ -23,6 +23,8 @@ const Banner = () => {
         marginInline: "40px",
         borderBottom: "1px solid #D2D2D2",
         paddingBottom: "20px",
+        gap: "10px",
+        marginTop: "10px",
       }}
     >
       <BannerTitle>
