@@ -1,6 +1,14 @@
 const CommentItem = ({ comment }) => {
   return (
-    <div style={{ marginLeft: comment.parentId ? 20 : 0, marginTop: 12 }}>
+    <div
+      style={{
+        marginLeft: comment.parentId ? 20 : 0,
+        marginTop: 12,
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+      }}
+    >
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         {comment.parentId && (
           <p style={{ color: "#aaa", fontWeight: "lighter" }}>ㄴ</p>

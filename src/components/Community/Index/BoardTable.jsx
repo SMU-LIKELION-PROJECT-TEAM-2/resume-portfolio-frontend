@@ -1,16 +1,26 @@
 import { useState } from "react";
-import { dummyPosts } from "../../../pages/Community/Community";
 import BoardItem from "./BoardItem";
-import { usePostStore } from "../../../stores/usePostStroe";
+import { usePostStore } from "../../../stores/usePostStore";
 
 const BoardTable = () => {
   const posts = usePostStore((state) => state.posts);
+  const selectedTag = usePostStore((state) => state.selectedTag);
+  const selectedBoard = usePostStore((state) => state.selectedBoard);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 8;
 
-  const totalPages = Math.ceil(posts.length / postsPerPage);
+  const filteredPosts = posts.filter((post) => {
+    const tagMatch = selectedTag ? post.tags.includes(selectedTag) : true;
+    const boardMatch = selectedBoard ? post.tags.includes(selectedBoard) : true;
+    return tagMatch && boardMatch;
+  });
+
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
   const startIndex = (currentPage - 1) * postsPerPage;
-  const currentPosts = posts.slice(startIndex, startIndex + postsPerPage);
+  const currentPosts = filteredPosts.slice(
+    startIndex,
+    startIndex + postsPerPage
+  );
   const emptyCount = postsPerPage - currentPosts.length;
   return (
     <main>

@@ -15,7 +15,7 @@ const Item = styled.div`
 const BoardItem = ({ post }) => {
   return (
     <Item>
-      <div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <p style={{ fontSize: "14px", color: "#888", display: "flex" }}>
           <img
             style={{

@@ -14,6 +14,10 @@ const PostTitle = styled.div`
   margin-inline: 40px;
   border-bottom: 1px solid #d2d2d2;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-block: 10px;
 `;
 
 const PostBody = styled.div`
